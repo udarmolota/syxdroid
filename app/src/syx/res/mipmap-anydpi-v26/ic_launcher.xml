@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SyxDroid's icon: the SyxDroid medallion on the launcher's black. The bitmap is the whole 108dp
+     layer with the medallion 70dp across in its middle, inside the 72dp a round mask shows, so no
+     mask cuts into the rim. Made from the logo by udarmolota. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_syx"/>
+    <foreground android:drawable="@android:color/transparent"/>
+</adaptive-icon>

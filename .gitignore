@@ -1,0 +1,37 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+build/
+/logs
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/.idea/
+
+# Working notes, kept out of the repo on purpose
+/TODO.md
+
+# Never commit game files: the player imports their own Songs of Syx on the device.
+SongsOfSyx.jar
+/game/
+/base/
+
+# The game's own Steam artwork, used here only as a colour reference: it belongs to Gamatron AB
+# and is never shipped or committed.
+header_alt_assets_3.jpg
+capsule_616x353_alt_assets_3.jpg
+
+# Markdown working documents stay local (PLAN.md, notes). Only the README, the NOTICE and licence
+# texts (GLFW's zlib licence must travel with its code) are committed.
+*.md
+!README.md
+!NOTICE.md
+!LICENSE.md

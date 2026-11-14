@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SyxDroid's own manifest overlay (both build types use src/syx/, see app/build.gradle.kts).
+     The icon opens the launcher (LauncherActivity, declared as LAUNCHER in src/main), like
+     RimDroid. SyxStartActivity is the screen the launcher opens to import the player's game
+     files and to prepare the game; it has no icon of its own. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The daily update check runs only when there is a network (UpdateChecker); Android requires this
+         for such a job. A normal permission: granted at install, the player is never asked. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application>
+        <activity android:name=".LauncherActivity">
+            <!-- The icon's long-press menu: settings, controls, saves, bug report -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+        <activity
+            android:name=".SyxStartActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:theme="@style/AppTheme" />
+        <!-- The daily check for a new SyxDroid release, see UpdateChecker -->
+        <service
+            android:name=".UpdateCheckJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+    </application>
+</manifest>

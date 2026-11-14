@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Long-press menu of the SyxDroid icon: the launcher's settings, the controls editor, the saves
+     and the bug report. targetPackage must be the application id (com.udarmolota.syxdroid):
+     resources cannot read it from the build. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="settings"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_settings"
+        android:shortcutShortLabel="@string/shortcut_settings_short"
+        android:shortcutLongLabel="@string/shortcut_settings_long">
+        <intent
+            android:action="com.udarmolota.syxdroid.action.OPEN_SETTINGS"
+            android:targetPackage="com.udarmolota.syxdroid"
+            android:targetClass="com.udarmolota.syxdroid.LauncherActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="controls"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_controls"
+        android:shortcutShortLabel="@string/shortcut_controls_short"
+        android:shortcutLongLabel="@string/shortcut_controls_long">
+        <intent
+            android:action="com.udarmolota.syxdroid.action.EDIT_CONTROLS"
+            android:targetPackage="com.udarmolota.syxdroid"
+            android:targetClass="com.udarmolota.syxdroid.ControlsEditorActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="saves"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_saves"
+        android:shortcutShortLabel="@string/shortcut_saves_short"
+        android:shortcutLongLabel="@string/shortcut_saves_long">
+        <intent
+            android:action="com.udarmolota.syxdroid.action.SAVES"
+            android:targetPackage="com.udarmolota.syxdroid"
+            android:targetClass="com.udarmolota.syxdroid.SaveTransferActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="bug_report"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_bug_report"
+        android:shortcutShortLabel="@string/shortcut_bug_report_short"
+        android:shortcutLongLabel="@string/shortcut_bug_report_long">
+        <intent
+            android:action="com.udarmolota.syxdroid.action.SEND_BUG_REPORT"
+            android:targetPackage="com.udarmolota.syxdroid"
+            android:targetClass="com.udarmolota.syxdroid.LauncherActivity" />
+    </shortcut>
+</shortcuts>

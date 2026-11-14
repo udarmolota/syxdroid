@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SyxDroid's start screen: one line and one bar while the game is prepared; before the first
+     import, a short explanation and two pickers (folder, zip); on failure the error with a way
+     into the launcher for logs and a bug report. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <TextView
+        android:id="@+id/start_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/deephall_preparing"
+        android:textAppearance="?attr/textAppearanceHeadline6" />
+
+    <TextView
+        android:id="@+id/start_message_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:visibility="gone"
+        tools:text="Extracting…"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/start_import_body_tv"
+        android:layout_width="wrap_content"
+        android:maxWidth="480dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="@string/syx_import_body"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/start_import_buttons_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/start_import_folder_mb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/syx_import_folder" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/start_import_zip_mb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/syx_import_zip" />
+    </LinearLayout>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/start_progress_lpi"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:indeterminate="true" />
+
+    <ScrollView
+        android:id="@+id/start_error_sv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/start_error_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textIsSelectable="true"
+            tools:text="java.io.IOException: No space left on device" />
+    </ScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/start_open_launcher_mb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/deephall_open_launcher"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</LinearLayout>

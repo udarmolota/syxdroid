@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/launcher_fragment">
+
+    <!-- Global actions. The drawer is reachable from every screen, and an action declared inside
+         one destination resolves only from that destination, so a drawer tap anywhere but the home
+         screen used to throw IllegalArgumentException. The ids are unchanged. -->
+    <action
+        android:id="@+id/action_open_new_game_instance_fragment"
+        app:destination="@id/new_game_instance_fragment" />
+    <action
+        android:id="@id/action_open_settings_fragment"
+        app:destination="@id/app_settings_fragment"/>
+    <action
+        android:id="@+id/action_open_instance_settings"
+        app:destination="@id/settings_fragment"/>
+    <action
+        android:id="@id/action_open_gamepad_mapper"
+        app:destination="@id/gamepad_mapper_fragment"/>
+    <action
+        android:id="@+id/action_open_wiki_fragment"
+        app:destination="@id/wiki_fragment"/>
+    <action
+        android:id="@+id/action_install_controls"
+        app:destination="@id/installControlsFragment" />
+    <action
+        android:id="@+id/action_install_driver"
+        app:destination="@id/install_driver_fragment" />
+    <action
+        android:id="@+id/action_export_log"
+        app:destination="@id/export_log_fragment" />
+    <action
+        android:id="@+id/action_open_controls_editor_launch"
+        app:destination="@id/controls_editor_launch_fragment" />
+
+    <fragment
+        android:id="@+id/launcher_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.LauncherFragment"
+        android:label="@string/fragment_label_launcher"
+        tools:layout="@layout/fragment_launcher" />
+
+    <fragment
+        android:id="@+id/new_game_instance_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.NewGameInstanceFragment"
+        android:label="@string/fragment_label_new_game_instance"
+        tools:layout="@layout/fragment_new_game_instance">
+    </fragment>
+
+    <!-- Per-instance launch settings, opened by the gear on an instance card. The argument is
+         nullable so the screen still works if something navigates here without one; it then reads
+         and writes the app-wide fallbacks. -->
+    <fragment
+        android:id="@+id/settings_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.SettingsFragment"
+        android:label="@string/fragment_label_instance_settings"
+        tools:layout="@layout/fragment_settings">
+        <argument
+            android:name="instance"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <!-- App-wide settings: the theme, and nothing else. -->
+    <fragment
+        android:id="@+id/app_settings_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.AppSettingsFragment"
+        android:label="@string/fragment_label_settings"
+        tools:layout="@layout/fragment_app_settings">
+    </fragment>
+
+    <fragment
+        android:id="@+id/gamepad_mapper_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.GamepadMapperFragment"
+        android:label="@string/nav_menu_gamepad_mapper"
+        tools:layout="@layout/fragment_gamepad_mapper">
+    </fragment>
+
+    <fragment
+        android:id="@+id/wiki_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.WikiFragment"
+        android:label="@string/fragment_label_wiki">
+    </fragment>
+
+    <fragment
+        android:id="@+id/installControlsFragment"
+        android:name="com.udarmolota.syxdroid.fragments.InstallControlsFragment"
+        android:label="@string/menu_install_controls"
+        tools:layout="@layout/fragment_install_controls" />
+
+    <fragment
+        android:id="@+id/install_driver_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.InstallDriverFragment"
+        android:label="@string/install_driver_menu" />
+
+    <fragment
+        android:id="@+id/export_log_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.ExportLogFragment"
+        android:label="@string/export_log_menu" />
+
+    <fragment
+        android:id="@+id/controls_editor_launch_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.ControlsEditorLaunchFragment"
+        android:label="@string/nav_menu_controls_editor"
+        tools:layout="@layout/fragment_controls_editor_launch" />
+
+</navigation>

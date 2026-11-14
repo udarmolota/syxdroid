@@ -1,0 +1,227 @@
+package com.udarmolota.syxdroid.game;
+
+import com.udarmolota.syxdroid.AppStorage;
+import com.udarmolota.syxdroid.BuildConfig;
+import com.udarmolota.syxdroid.C;
+import com.udarmolota.syxdroid.FileUtils;
+
+import java.io.File;
+import java.nio.file.FileSystemException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.StringJoiner;
+
+public class GameInstance {
+    private static final String INSTANCES_ROOT_DIR_NAME = "instances";
+    public static final String GAME_FILES_DIR_NAME = "game";
+
+    private String name;
+    private String buildVersion;
+    private String homePath;
+    private boolean installationFinished = false;
+    private String[] classPath;
+    private String[] bootClassPath;
+    private String[] extraClassPath;
+    private String[] libraryPath;
+    private String[] libraryPathForEmulation;
+    private String[] extraJvmArgs;
+    private String[] args;
+    private String mainClassName;
+    private String presetName;
+    // A file inside the game directory that says the game is there.
+    private String gameFileMarker;
+
+    public GameInstance(String name, InstallationPreset preset) throws FileSystemException {
+        this.name = name;
+        this.buildVersion = preset.buildVersion;
+        makeDirs();
+        this.classPath = preset.classPathArray;
+        this.bootClassPath = preset.bootClassPathArray;
+        this.extraClassPath = preset.extraJars;
+        this.libraryPath = preset.libraryPathArray;
+        this.libraryPathForEmulation = preset.libraryPathForEmulationArray;
+        this.extraJvmArgs = preset.extraJvmArgs;
+        this.args = preset.args;
+        this.mainClassName = preset.mainClassName;
+        this.presetName = preset.name;
+        this.gameFileMarker = preset.gameFileMarker;
+    }
+
+    /**
+     * Re-points this instance at the current version of its preset, which GameLauncher does at
+     * every launch. The same fields the constructor takes from the preset; the name and the
+     * folders stay.
+     */
+    public void applyPreset(InstallationPreset preset) {
+        this.buildVersion = preset.buildVersion;
+        this.classPath = preset.classPathArray;
+        this.bootClassPath = preset.bootClassPathArray;
+        this.extraClassPath = preset.extraJars;
+        this.libraryPath = preset.libraryPathArray;
+        this.libraryPathForEmulation = preset.libraryPathForEmulationArray;
+        this.extraJvmArgs = preset.extraJvmArgs;
+        this.args = preset.args;
+        this.mainClassName = preset.mainClassName;
+        this.presetName = preset.name;
+        this.gameFileMarker = preset.gameFileMarker;
+    }
+
+    private static String buildHomePath(String name) {
+        return AppStorage.requireSingleton().getHomePath() + "/" + INSTANCES_ROOT_DIR_NAME + "/" + name;
+    }
+
+    public static boolean isValidName(String name) {
+        return FileUtils.isValidFilenameStrict(name);
+    }
+
+    public static boolean isUniqueName(String name) {
+        return !new File(buildHomePath(name)).exists();
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * This instance's own launch settings (renderer, driver, JVM args, scale, toggles). Built on
+     * demand and deliberately not cached: {@link InstanceSettings} is a thin view over shared
+     * preferences, so a settings screen and the launch path always see the same stored values.
+     */
+    public InstanceSettings settings() {
+        return new InstanceSettings(this.name);
+    }
+
+  public String getBuildVersion() { return this.buildVersion; }
+
+
+  public String getHomePath() {
+        return this.homePath;
+    }
+
+    /**
+     * Rewrite a stored home path into the spelling the runtime resolves to, so it matches what
+     * {@link AppStorage#getHomePath()} hands out today. Same directory before and after - only the
+     * recorded string changes. Returns true when it changed, so the caller knows to persist.
+     *
+     * <p>Left alone when the directory is not there: a path that cannot be resolved is more likely
+     * an instance whose files are gone than one worth rewriting, and rewriting it would only hide
+     * that.
+     */
+    public boolean normalizeHomePath() {
+        if (this.homePath == null) return false;
+        try {
+            File dir = new File(this.homePath);
+            if (!dir.exists()) return false;
+            String resolved = dir.getCanonicalPath();
+            if (resolved.equals(this.homePath)) return false;
+            this.homePath = resolved;
+            return true;
+        } catch (java.io.IOException e) {
+            return false;
+        }
+    }
+
+    public String getGamePath() {
+        return this.homePath + "/" + GAME_FILES_DIR_NAME;
+    }
+
+    public String getLdLibraryPathForEmulation() {
+        StringJoiner joiner = new StringJoiner(":");
+        for (String path : this.libraryPathForEmulation) {
+            joiner.add(AppStorage.requireSingleton().getHomePath() + "/" + path);
+        }
+        return joiner + ":.";
+    }
+
+    public String getJavaLibraryPath() {
+        StringJoiner libsJoiner = new StringJoiner(":");
+        for (String path : this.libraryPath) {
+            libsJoiner.add(AppStorage.requireSingleton().getHomePath() + "/" + path);
+        }
+        return libsJoiner.toString();
+    }
+
+    public ArrayList<String> getJvmArgsAsList() { 
+        ArrayList<String> jvmArgsList = new ArrayList<>();
+        jvmArgsList.add("-Duser.home=" + this.homePath);
+        jvmArgsList.add("-Djava.io.tmpdir=" + AppStorage.requireSingleton().getCachePath());
+
+        jvmArgsList.add("-Djava.library.path=" + getJavaLibraryPath() + ":.");
+        // LWJGL's hash self-check compares the loaded natives' SHA1 against hashes of the OFFICIAL
+        // builds baked into the game's lwjgl jars. Every LWJGL native we ship is self-built for
+        // bionic (the official linux-arm64 ones are glibc and cannot load), so the check can never
+        // pass and only spams "[LWJGL] [ERROR] Incompatible Java and native library versions" into
+        // every session log. Disable it with LWJGL's own switch.
+        jvmArgsList.add("-Dorg.lwjgl.util.NoHashChecks=true");
+        if (BuildConfig.DEBUG) {
+            jvmArgsList.add("-Dorg.lwjgl.util.Debug=true"); // debug
+            jvmArgsList.add("-Dorg.lwjgl.util.DebugLoader=true"); // debug
+        }
+        StringJoiner jarsJoiner = new StringJoiner(":");
+        for (String path : this.extraClassPath) {
+            jarsJoiner.add(AppStorage.requireSingleton().getHomePath() + "/" + path);
+        }
+        StringJoiner bootJoiner = new StringJoiner(":");
+        if (this.bootClassPath != null) {
+            for (String path : this.bootClassPath) {
+                bootJoiner.add(AppStorage.requireSingleton().getHomePath() + "/" + path);
+            }
+        }
+        String bootPrefix = bootJoiner.length() > 0 ? bootJoiner + ":" : "";
+        jvmArgsList.add("-Djava.class.path=" + bootPrefix + String.join(":", this.classPath) + ":" + jarsJoiner);
+
+        jvmArgsList.addAll(Arrays.asList(this.extraJvmArgs));
+
+        return jvmArgsList;
+    }
+
+    public String[] getClassPathArray() {
+        return this.classPath;
+    }
+
+    public ArrayList<String> getArgsAsList() {
+        return new ArrayList<>(Arrays.asList(this.args));
+    }
+
+    public String getMainClassName() {
+        return this.mainClassName;
+    }
+
+    private void makeDirs() throws FileSystemException {
+        // An existing folder is taken as it is. The new-instance screen refuses names whose folder
+        // exists, so only the single Songs of Syx instance (SyxGame) gets here with one: its
+        // folder can outlive the instance list, and it holds the player's saves.
+        File homeDir = new File(buildHomePath(this.name));
+        if (!homeDir.isDirectory() && !homeDir.mkdirs()) {
+            throw new FileSystemException("Failed to create instance directory " + homeDir.getAbsolutePath());
+        }
+        this.homePath = homeDir.getAbsolutePath();
+
+        File gameDir = new File(getGamePath());
+        if (!gameDir.isDirectory() && !gameDir.mkdirs()) {
+            throw new FileSystemException("Failed to create game files directory " + gameDir.getAbsolutePath());
+        }
+    }
+
+    public boolean isInstallationFinished() {
+        return this.installationFinished;
+    }
+
+    protected void markInstallationFinished() {
+        this.installationFinished = true;
+    }
+
+    public boolean hasGameFiles() {
+        if (this.gameFileMarker != null && !this.gameFileMarker.isEmpty()) {
+            return new File(getGamePath(), this.gameFileMarker).exists();
+        }
+        // No marker: fall back to the main class as a loose .class file.
+        File mainClassFile = new File(getGamePath() + "/" + getMainClassName() + ".class");
+        return mainClassFile.exists();
+    }
+
+    public String getPresetName() {
+        return this.presetName;
+    }
+
+}
