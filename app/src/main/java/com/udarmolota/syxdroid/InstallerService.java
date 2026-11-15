@@ -733,7 +733,7 @@ public class InstallerService extends Service implements TaskProgressListener {
 
     // Builds the same diagnostic zip (report.txt + crash/native/shader/launcher logs) used
     // by both "Export logs" (SAF-picked destination) and the "Report a bug" email attachment, so
-    // there is one definition of what a Zomdroid bug report contains. Caller owns/closes `os`.
+    // there is one definition of what a SyxDroid bug report contains. Caller owns/closes `os`.
     /** gi may be null - no instance installed yet. That is not the empty case but the hottest one:
      *  the user whose dependency install or instance creation is failing has no instance BY
      *  DEFINITION, and the launcher-level logcat capture is exactly where that failure is written.
@@ -798,6 +798,7 @@ public class InstallerService extends Service implements TaskProgressListener {
             // budget toggle and the resolution the renderer actually draws at.
             writeLogUtf8(zos, "Memory   : saver " + (settings.isMemorySaver() ? "ON" : "off")
                     + ", render scale " + String.format(Locale.US, "%.2f", settings.getRenderScale()) + "\n");
+            writeLogUtf8(zos, "FPS limit: " + settings.getFpsLimit() + "\n");
             String jvmArgs = LauncherPreferences.squashWhitespace(settings.getJvmArgs());
             writeLogUtf8(zos, "JVM args : " + (jvmArgs.isEmpty() ? "(none)" : jvmArgs)
                     + "  [" + LauncherPreferences.describeJvmArgsPreset(jvmArgs) + "]\n");
@@ -818,6 +819,7 @@ public class InstallerService extends Service implements TaskProgressListener {
             addFileToZip(zos, glTrace, "gl_trace.txt");
             addFileToZip(zos, launcherLog, "log.txt");
             addFileToZip(zos, lastLauncherLog, "lastlog.txt");
+            addGameErrorLogs(zos, gi);
 
             // How the last processes ended, as Android recorded it: the logs above are written by the
             // game's process itself and just stop when it is killed (memory) or crashes natively
@@ -834,6 +836,31 @@ public class InstallerService extends Service implements TaskProgressListener {
                 zos.write(nativeCrash);
                 zos.closeEntry();
             }
+        }
+    }
+
+    /** How many of the game's own error logs go into a report, newest first, and how big each may be. */
+    private static final int GAME_LOGS_MAX_FILES = 5;
+    private static final long GAME_LOGS_MAX_BYTES = 2L * 1024 * 1024;
+
+    /**
+     * Songs of Syx writes its own error reports into .local/share/songsofsyx/logs when something
+     * throws inside the game; that is the first file to read after an in-game error. The one
+     * folder that is listed rather than named (see the note above): it holds only those reports,
+     * and the newest five, at most 2 MB each, go in as game-logs/NAME.
+     */
+    private static void addGameErrorLogs(ZipOutputStream zos, GameInstance gi) throws IOException {
+        if (gi == null) return;
+        File dir = new File(gi.getHomePath() + "/.local/share/songsofsyx/logs");
+        File[] files = dir.listFiles(File::isFile);
+        if (files == null || files.length == 0) return;
+        java.util.Arrays.sort(files, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+        int added = 0;
+        for (File f : files) {
+            if (added >= GAME_LOGS_MAX_FILES) break;
+            if (f.length() > GAME_LOGS_MAX_BYTES) continue;
+            addFileToZip(zos, f, "game-logs/" + f.getName());
+            added++;
         }
     }
 
