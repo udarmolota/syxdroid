@@ -1,0 +1,94 @@
+name: Build SyxDroid APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # The full history: the build stamps the commit id into the app (GIT_BUILD_ID)
+          fetch-depth: 0
+
+      - name: Read app version
+        id: app_version
+        shell: bash
+        run: |
+          VERSION_NAME=$(sed -nE 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' app/build.gradle.kts | head -n 1)
+          test -n "$VERSION_NAME"
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      # The same NDK and CMake as app/build.gradle.kts (ndkVersion, externalNativeBuild)
+      - name: Install NDK
+        run: |
+          sdkmanager "ndk;27.3.13750724" "cmake;3.22.1"
+          echo "NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.3.13750724" >> $GITHUB_ENV
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Clean
+        run: ./gradlew clean
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+        env:
+          ANDROID_NDK_HOME: ${{ env.NDK_HOME }}
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: syxdroid-debug-${{ steps.app_version.outputs.name }}
+          path: app/build/outputs/apk/debug/syxdroid-debug-${{ steps.app_version.outputs.name }}.apk
+          retention-days: 30
+
+      # No signing values reach Gradle here, so this APK comes out unsigned; the next step signs it.
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+        env:
+          ANDROID_NDK_HOME: ${{ env.NDK_HOME }}
+
+      # The release key from the repository secrets. Pull requests get no secrets: unsigned.
+      - name: Sign Release APK
+        if: github.event_name != 'pull_request'
+        env:
+          SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          APK: app/build/outputs/apk/release/syxdroid-release-${{ steps.app_version.outputs.name }}.apk
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)
+          KEY="$RUNNER_TEMP/release.p12"
+          echo "$SIGNING_KEY_BASE64" | base64 -d > "$KEY"
+          "$BT/apksigner" sign --ks "$KEY" --ks-type PKCS12 --ks-key-alias "$SIGNING_KEY_ALIAS" \
+            --ks-pass env:SIGNING_STORE_PASSWORD --key-pass env:SIGNING_KEY_PASSWORD \
+            --v1-signing-enabled false --v2-signing-enabled true --v3-signing-enabled true "$APK"
+          rm -f "$KEY"
+          "$BT/apksigner" verify --print-certs --min-sdk-version 30 "$APK"
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: syxdroid-release-${{ steps.app_version.outputs.name }}
+          path: app/build/outputs/apk/release/syxdroid-release-${{ steps.app_version.outputs.name }}.apk
+          retention-days: 30

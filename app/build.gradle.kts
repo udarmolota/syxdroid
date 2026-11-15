@@ -175,8 +175,8 @@ android {
         }
     }
     sourceSets {
-        // Both build types are SyxDroid: they share its manifest overlay (the icon opens
-        // SyxStartActivity), name, icon and shortcuts from src/syx/.
+        // Both build types are SyxDroid: they share its manifest overlay, name, icon and
+        // shortcuts from src/syx/.
         for (buildType in listOf("debug", "release")) {
             getByName(buildType) {
                 manifest.srcFile("src/syx/AndroidManifest.xml")
