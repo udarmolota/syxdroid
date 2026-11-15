@@ -46,6 +46,42 @@ public class SettingsFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * The game's language: "Automatic" (the phone's language when the game has it), English, and
+     * every language in this instance's locale.zip, each in its own name. Applies at the next start.
+     */
+    private void setUpGameLanguage() {
+        java.util.List<String> codes = new java.util.ArrayList<>();
+        java.util.List<String> labels = new java.util.ArrayList<>();
+        codes.add(com.udarmolota.syxdroid.game.GameLanguages.AUTO);
+        labels.add(getString(R.string.syx_game_language_auto));
+        codes.add(com.udarmolota.syxdroid.game.GameLanguages.ENGLISH);
+        labels.add(com.udarmolota.syxdroid.game.GameLanguages.displayName(com.udarmolota.syxdroid.game.GameLanguages.ENGLISH));
+        com.udarmolota.syxdroid.game.GameInstance instance = instanceName == null ? null
+                : com.udarmolota.syxdroid.game.GameInstanceManager.requireSingleton().getInstanceByName(instanceName);
+        if (instance != null) {
+            for (String code : com.udarmolota.syxdroid.game.GameLanguages.available(instance)) {
+                codes.add(code);
+                labels.add(com.udarmolota.syxdroid.game.GameLanguages.displayName(code));
+            }
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.spinner_item, labels);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        android.widget.Spinner spinner = binding.settingsGameLanguageS;
+        spinner.setAdapter(adapter);
+        int current = codes.indexOf(settings.getGameLanguage());
+        spinner.setSelection(Math.max(0, current), false);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                settings.setGameLanguage(codes.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
     /** Off in SyxDroid: Songs of Syx runs on MobileGlues only. */
     private static final boolean SHOW_RENDERER_CHOICE = false;
 
@@ -272,6 +308,7 @@ public class SettingsFragment extends Fragment {
         }
 
         setUpRenderResolution();
+        setUpGameLanguage();
 
         // In-game display: nothing / the plain FPS counter / the performance bar. Its own card, so
         // the three choices and what they mean are read together. Takes effect at the next launch.

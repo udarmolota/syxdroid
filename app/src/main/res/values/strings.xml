@@ -453,8 +453,8 @@
     <!-- Deephall: the empty launcher means the game is not unpacked yet (normally the Settings shortcut
          unpacks it first, see LauncherActivity#handleShortcutAction) -->
     <string name="deephall_empty_title">Songs of Syx is not imported yet</string>
-    <string name="deephall_empty_body">SyxDroid does not include the game. Tap the button below and choose your own copy: the game folder or a zip of it.</string>
-    <string name="deephall_empty_start">Import the game</string>
+    <string name="deephall_empty_body">SyxDroid does not include the game. Tap the button and pick a zip of your own copy of Songs of Syx, or download it from Steam on the Game page.</string>
+    <string name="deephall_empty_start">New instance</string>
     <string name="game_loading">Loading the game…</string>
     <string name="game_loading_preparing_files">On the first start and after an update the game prepares its files. On some phones this takes several minutes.</string>
 
@@ -565,4 +565,44 @@
     <string name="bug_report_save_failed">Could not save the report: %1$s</string>
     <string name="bug_report_no_mail_use_file">No email app found on this device. Save the report to a file and send it from another device.</string>
     <string name="no_instances">Songs of Syx is not imported yet</string>
+    <!-- The Game page: download the player's own Songs of Syx from Steam (SteamGameDownloader) -->
+    <string name="bottom_nav_game">Game</string>
+    <string name="steam_title">Download from Steam</string>
+    <string name="steam_intro">Download your own copy of Songs of Syx straight from Steam to this phone, with no PC. You need a Steam account that owns the game. The game is saved as a zip in Download/SyxDroid (about 330 MB; about 500 MB of free space is needed while it downloads). Then create an instance from it, here or later with +.</string>
+    <string name="steam_username">Steam login</string>
+    <string name="steam_password">Password</string>
+    <string name="steam_privacy">Your login and password go only to Steam, for this one sign-in, and are not saved. Steam will ask you to approve the sign-in in the Steam Mobile app, or for a Steam Guard code.</string>
+    <string name="steam_download">Download</string>
+    <string name="steam_cancel">Cancel</string>
+    <string name="steam_progress_title">Progress</string>
+    <string name="steam_log_empty">Nothing yet.</string>
+    <string name="steam_need_credentials">Enter your Steam login and password.</string>
+    <string name="steam_notification">Downloading Songs of Syx from Steam</string>
+    <string name="steam_tip_network">Tip: stay on one network (Wi-Fi or mobile) until the download finishes; switching can drop the sign-in.</string>
+    <string name="steam_approve_in_app">Approve the sign-in in your Steam Mobile app…</string>
+    <string name="steam_resuming">Found a partial download: resuming where it stopped…</string>
+    <string name="steam_downloading">Downloading the game files…</string>
+    <string name="steam_importing">Download finished.</string>
+    <string name="steam_done">Saved to %1$s (%2$d MB). Create an instance from it now, or later with + on the Home page.</string>
+    <string name="steam_done_title">Done</string>
+    <string name="steam_failed_title">Download stopped</string>
+    <string name="steam_cancelled">Download cancelled. Starting again resumes where it stopped.</string>
+    <string name="steam_stopped">Stopped before finishing. Please try again: it resumes where it stopped.</string>
+    <string name="steam_auth_failed">Steam sign-in failed: %1$s</string>
+    <string name="steam_connection_lost">The connection to Steam was lost. Try again: the download resumes. %1$s</string>
+    <string name="steam_download_failed">The download failed: %1$s</string>
+    <string name="steam_no_game_files">Steam sent no Songs of Syx files. Does this account own the game?</string>
+    <string name="steam_guard_title">Steam Guard</string>
+    <string name="steam_guard_app">Enter the code from your Steam Mobile app.</string>
+    <string name="steam_guard_email">Enter the code Steam sent to %1$s.</string>
+    <string name="steam_guard_wrong">That code was not accepted.</string>
+    <!-- New instance ("+": pick a zip) and the Steam download's hand-over to it -->
+    <string name="syx_new_instance_title">New instance</string>
+    <string name="syx_instance_created">%1$s is ready. Start it with ▶.</string>
+    <string name="transfer_instance">Instance</string>
+    <string name="steam_later">Later</string>
+    <string name="steam_packing">Saving the game as a zip in Download/SyxDroid…</string>
+    <string name="steam_create_instance">Create new instance</string>
+    <string name="syx_game_language">Game language</string>
+    <string name="syx_game_language_auto">Automatic (phone language)</string>
 </resources>

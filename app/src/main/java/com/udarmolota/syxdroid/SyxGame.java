@@ -14,13 +14,12 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * The one Songs of Syx instance SyxDroid plays.
+ * Songs of Syx instances: their names, how a new one is made from a zip of the player's own copy
+ * ({@link #createInstanceFromZip}) and what it starts with ({@link #setUpNewInstance}).
  *
- * <p>Unlike Deephall, whose launcher this code base comes from, the game is never inside the APK:
- * the player imports their own copy (folder or zip) into this instance's game dir. {@link #prepare}
- * creates the instance the first time, checks that the game files are there, and gives it the
- * on-screen controls if it has none. When the files are missing it throws
- * {@link GameNotImportedException}, which the start screen answers by asking for the game.
+ * <p>The game is never inside the APK: each instance gets the player's own copy imported into its
+ * game dir. ({@link #prepare} and {@link #INSTANCE_NAME} are the first, single-instance version,
+ * still used by the old start screen.)
  *
  * <p>What it never touches: the game's user files under the instance's home
  * ({@code .local/share/songsofsyx}: saves, mods, profile, the game's own settings) and the game
@@ -61,6 +60,65 @@ public final class SyxGame {
     public static boolean isImported() {
         GameInstance instance = GameInstanceManager.requireSingleton().getInstanceByName(INSTANCE_NAME);
         return instance != null && instance.hasGameFiles();
+    }
+
+    /** A new instance's name: "SongsOfSyx", then "SongsOfSyx2", "SongsOfSyx3", ... (as in RimDroid). */
+    public static String suggestInstanceName() {
+        String base = INSTANCE_NAME;
+        if (GameInstance.isUniqueName(base)) return base;
+        for (int i = 2; i < 1000; i++) {
+            String name = base + i;
+            if (GameInstance.isUniqueName(name)) return name;
+        }
+        return base + System.currentTimeMillis();
+    }
+
+    /**
+     * Creates a new instance from a zip of the game (picked by the player, or the Steam download in
+     * Download/SyxDroid): registers it under the next free name and hands the import to
+     * InstallerService (CREATE_GAME_INSTANCE), whose progress the launcher shows. Main thread.
+     *
+     * @return the new instance's name, or null if it could not be made
+     */
+    public static String createInstanceFromZip(@NonNull Context context, @NonNull android.net.Uri zip) {
+        InstallationPreset preset = PresetManager.findByName(PRESET_NAME);
+        GameInstance instance;
+        try {
+            instance = new GameInstance(suggestInstanceName(), preset);
+        } catch (IOException e) {
+            android.widget.Toast.makeText(context, String.valueOf(e.getMessage()), android.widget.Toast.LENGTH_LONG).show();
+            return null;
+        }
+        GameInstanceManager.requireSingleton().registerInstance(instance);
+        android.content.Intent intent = new android.content.Intent(context, InstallerService.class);
+        intent.putExtra(InstallerService.EXTRA_COMMAND, InstallerService.Task.CREATE_GAME_INSTANCE.ordinal());
+        intent.putExtra(InstallerService.EXTRA_GAME_INSTANCE_NAME, instance.getName());
+        intent.putExtra(InstallerService.EXTRA_INSTALL_PRESET_NAME, preset.name);
+        intent.putExtra(InstallerService.EXTRA_IMPORT_KIND, SyxImporter.KIND_ZIP);
+        intent.putExtra(InstallerService.EXTRA_ARCHIVE_URI, zip);
+        // The picker's read grant belongs to the activity; hand it to the service.
+        intent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startForegroundService(intent);
+        return instance.getName();
+    }
+
+    /**
+     * A new instance's starting point, once its game files are in: SyxDroid's settings (MobileGlues,
+     * the lowest render resolution), the built-in on-screen controls, and "installed".
+     */
+    static void setUpNewInstance(@NonNull Context context, @NonNull GameInstance instance) throws IOException {
+        applyDefaultSettings(instance.settings());
+        installDefaultControls(context, new File(instance.getGamePath()));
+        GameInstanceManager manager = GameInstanceManager.requireSingleton();
+        if (!instance.isInstallationFinished()) manager.markInstallationFinished(instance);
+    }
+
+    /** Whether any instance plays this preset with its game files in place. */
+    public static boolean anyInstanceReady() {
+        for (GameInstance gi : GameInstanceManager.requireSingleton().getInstances()) {
+            if (gi.hasGameFiles()) return true;
+        }
+        return false;
     }
 
     /**

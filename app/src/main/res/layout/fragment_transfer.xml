@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Import / export (TransferFragment, as in RimDroid): a card each for the saves, the game's
-     settings and the on-screen controls. SyxDroid has one game, so there is no instance picker. -->
+<!-- Import / export (TransferFragment, as in RimDroid): the instance once at the top, then a card
+     each for the saves, the game's settings and the on-screen controls. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -11,6 +11,29 @@
         android:orientation="vertical"
         android:paddingTop="16dp"
         android:paddingBottom="8dp">
+
+        <!-- The instance -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/AppTheme.TransferCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/AppTheme.TransferCardTitle"
+                    android:text="@string/transfer_instance" />
+
+                <Spinner
+                    android:id="@+id/sp_transfer_instance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Saves -->
         <com.google.android.material.card.MaterialCardView

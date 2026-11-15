@@ -36,8 +36,8 @@ import java.nio.charset.StandardCharsets;
  * and asks once before it writes anything. Saves and settings are {@link GameDataTransfer} zips,
  * the controls the layout .json the controls editor uses.
  *
- * <p>SyxDroid plays one game, so this works on the Songs of Syx instance ({@link SyxGame}); before
- * the game is imported there is nothing to export or import into, and the buttons say so.
+ * <p>The instance is picked once at the top; with no instance yet there is nothing to export or
+ * import into, and the buttons say so.
  */
 public class TransferFragment extends Fragment {
 
@@ -48,6 +48,11 @@ public class TransferFragment extends Fragment {
 
     /** What the open system picker is for; kept across a recreation of this screen. */
     private int pending = NONE;
+    private static final String STATE_INSTANCE = "instance";
+    private android.widget.Spinner spInstance;
+    private final java.util.List<GameInstance> instances = new java.util.ArrayList<>();
+    /** The instance an import or export in flight belongs to; kept across a recreation. */
+    private String pendingInstance;
 
     private final ActivityResultLauncher<String[]> pickImport =
             registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::confirmImport);
@@ -64,7 +69,20 @@ public class TransferFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
-        if (savedInstanceState != null) pending = savedInstanceState.getInt(STATE_PENDING, NONE);
+        if (savedInstanceState != null) {
+            pending = savedInstanceState.getInt(STATE_PENDING, NONE);
+            pendingInstance = savedInstanceState.getString(STATE_INSTANCE);
+        }
+        spInstance = v.findViewById(R.id.sp_transfer_instance);
+        instances.clear();
+        instances.addAll(GameInstanceManager.requireSingleton().getInstances());
+        java.util.List<String> names = new java.util.ArrayList<>();
+        if (instances.isEmpty()) names.add(getString(R.string.no_instances));
+        for (GameInstance gi : instances) names.add(gi.getName());
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_spinner_item, names);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spInstance.setAdapter(adapter);
         v.findViewById(R.id.btn_transfer_saves_import).setOnClickListener(b -> startImport(SAVES));
         v.findViewById(R.id.btn_transfer_saves_export).setOnClickListener(b -> startExport(SAVES));
         v.findViewById(R.id.btn_transfer_settings_import).setOnClickListener(b -> startImport(SETTINGS));
@@ -77,17 +95,27 @@ public class TransferFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_PENDING, pending);
+        outState.putString(STATE_INSTANCE, pendingInstance);
     }
 
-    /** The Songs of Syx instance, or null (with a message) before the game is imported. */
+    /** The picked instance, or null (with a message) when there is none or it has no game yet. */
     @Nullable
     private GameInstance gameOrToast() {
-        GameInstance gi = GameInstanceManager.requireSingleton().getInstanceByName(SyxGame.INSTANCE_NAME);
+        int i = spInstance == null ? -1 : spInstance.getSelectedItemPosition();
+        GameInstance gi = (i >= 0 && i < instances.size()) ? instances.get(i) : null;
         if (gi == null || !gi.hasGameFiles()) {
             Toast.makeText(requireContext(), R.string.syx_transfer_no_game, Toast.LENGTH_LONG).show();
             return null;
         }
+        pendingInstance = gi.getName();
         return gi;
+    }
+
+    /** The instance the open picker was started for. */
+    @Nullable
+    private GameInstance pendingGame() {
+        return pendingInstance == null ? null
+                : GameInstanceManager.requireSingleton().getInstanceByName(pendingInstance);
     }
 
     private static File controlsFile(GameInstance gi) {
@@ -106,7 +134,7 @@ public class TransferFragment extends Fragment {
     private void confirmImport(@Nullable Uri uri) {
         int what = pending;
         pending = NONE;
-        GameInstance gi = GameInstanceManager.requireSingleton().getInstanceByName(SyxGame.INSTANCE_NAME);
+        GameInstance gi = pendingGame();
         if (uri == null || gi == null || !isAdded()) return;
         String file = displayName(uri);
         if (file == null) file = uri.getLastPathSegment();
@@ -191,7 +219,7 @@ public class TransferFragment extends Fragment {
     private void export(@Nullable Uri uri) {
         final int what = pending;
         pending = NONE;
-        final GameInstance gi = GameInstanceManager.requireSingleton().getInstanceByName(SyxGame.INSTANCE_NAME);
+        final GameInstance gi = pendingGame();
         if (uri == null || gi == null || !isAdded()) return;
         final Context app = requireContext().getApplicationContext();
         new Thread(() -> {

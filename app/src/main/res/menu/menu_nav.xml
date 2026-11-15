@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group android:id="@+id/group_controls" android:checkableBehavior="none">
+        <!-- New instance first, as in RimDroid -->
+        <item
+            android:id="@+id/action_new_instance"
+            android:title="@string/syx_new_instance_title"
+            android:icon="@drawable/mt_icon_add"
+            app:showAsAction="never"/>
         <item
             android:id="@+id/action_open_settings_fragment"
             android:title="@string/fragment_label_settings"

@@ -191,6 +191,22 @@
                     android:textAppearance="?attr/textAppearanceBodySmall"
                     android:text="@string/syx_render_res_hint"/>
 
+                <!-- Songs of Syx's language (GameLanguages): its own launcher, which SyxDroid
+                     skips, was the only place to pick it. -->
+                <TextView
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:text="@string/syx_game_language"/>
+
+                <Spinner
+                    android:id="@+id/settings_game_language_s"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"/>
+
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

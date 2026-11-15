@@ -64,10 +64,14 @@ public class ControlsEditorActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // ПЕРВЫМ ДЕЛОМ — до любых других вызовов на inputControlsV
-        // Without an instance name it was opened from the app icon's Controls shortcut, which
-        // always means the bundled Deephall instance.
+        // Without an instance name it was opened from the app icon's Controls shortcut: the first
+        // instance, the one most players have.
         String instanceName = getIntent().getStringExtra(EXTRA_INSTANCE_NAME);
-        if (instanceName == null) instanceName = SyxGame.INSTANCE_NAME;
+        if (instanceName == null) {
+            java.util.List<com.udarmolota.syxdroid.game.GameInstance> all =
+                    com.udarmolota.syxdroid.game.GameInstanceManager.requireSingleton().getInstances();
+            instanceName = all.isEmpty() ? SyxGame.INSTANCE_NAME : all.get(0).getName();
+        }
         com.udarmolota.syxdroid.game.GameInstance instance =
                 com.udarmolota.syxdroid.game.GameInstanceManager.requireSingleton().getInstanceByName(instanceName);
         if (instance == null) {
@@ -83,7 +87,8 @@ public class ControlsEditorActivity extends AppCompatActivity {
             return;
         }
         binding.inputControlsV.setInstanceName(instanceName);
-        isBundledInstance = SyxGame.INSTANCE_NAME.equals(instanceName);
+        // Every SyxDroid instance plays Songs of Syx, so each gets the built-in layout's icons and Reset.
+        isBundledInstance = true;
         backgroundFile = new File(instance.getGamePath(), "controls/" + BACKGROUND_FILE_NAME);
 
         pickIconLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {

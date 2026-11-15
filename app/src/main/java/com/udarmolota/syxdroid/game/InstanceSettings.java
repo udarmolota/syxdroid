@@ -130,6 +130,18 @@ public class InstanceSettings {
         prefs.edit().putBoolean(keyPrefix + "debug", debug).apply();
     }
 
+    /**
+     * Songs of Syx's language: {@link GameLanguages#AUTO} (the phone's language when the game has
+     * it), "" for English, or a code from the game's locale.zip ("ru", "pt-BR", ...).
+     */
+    public String getGameLanguage() {
+        return prefs.getString(keyPrefix + "game_language", GameLanguages.AUTO);
+    }
+
+    public void setGameLanguage(String code) {
+        prefs.edit().putString(keyPrefix + "game_language", code).apply();
+    }
+
     /** Deephall's texture set: {@link GameTextures#AUTO} (by installed RAM), FULL or REDUCED. */
     public String getGameTextures() {
         return prefs.getString(keyPrefix + "game_textures", GameTextures.AUTO);

@@ -53,9 +53,32 @@ public class LauncherActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
     private boolean inited = false;
+
+    /**
+     * New instance, as in RimDroid: "+" opens the file picker, the player picks the game zip, done.
+     * The instance gets the next free name (SyxGame.createInstanceFromZip) and the import shows its
+     * progress on the home page.
+     */
+    private final androidx.activity.result.ActivityResultLauncher<String[]> pickGameZip =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.OpenDocument(), uri -> {
+                if (uri == null) return;
+                createInstanceFromZip(uri);
+            });
+
+    /** Opens the file picker for a zip of the game; the pick becomes a new instance. */
+    public void pickGameZip() {
+        // Some file managers label zips application/x-zip-compressed.
+        pickGameZip.launch(new String[]{"application/zip", "application/x-zip-compressed", "application/x-zip"});
+    }
+
+    /** A new instance from this zip; back to the home page, where the import's progress shows. */
+    public void createInstanceFromZip(@NonNull Uri zip) {
+        if (SyxGame.createInstanceFromZip(this, zip) == null) return;
+        if (navController != null) navController.popBackStack(R.id.launcher_fragment, false);
+    }
     /** The bottom bar's pages (menu_bottom_nav.xml): top level, and the only screens showing the bar. */
     private static final int[] BOTTOM_NAV_DESTINATIONS = {
-            R.id.launcher_fragment, R.id.transfer_fragment, R.id.projects_fragment};
+            R.id.launcher_fragment, R.id.download_fragment, R.id.transfer_fragment, R.id.projects_fragment};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +145,11 @@ public class LauncherActivity extends AppCompatActivity {
         });
 
         binding.launcherNv.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.action_open_controls_editor) {
+            if (item.getItemId() == R.id.action_new_instance) {
+                binding.drawerLayout.close();
+                pickGameZip();
+                return true;
+            } else if (item.getItemId() == R.id.action_open_controls_editor) {
                 //Intent intent = new Intent(this, ControlsEditorActivity.class);
                 //startActivity(intent);
                 binding.drawerLayout.close();
@@ -178,22 +205,16 @@ public class LauncherActivity extends AppCompatActivity {
     private void handleShortcutAction(Intent intent) {
         String action = intent != null ? intent.getAction() : null;
         if (ACTION_OPEN_SETTINGS.equals(action)) {
-            // The bundled instance's own settings - renderer, env vars, scale - are the ones that
-            // matter. Before the game has been unpacked there is no instance yet, and the launcher
-            // would only show an empty list: unpack it first on the start screen, which then comes
-            // back here with the instance in place.
-            if (GameInstanceManager.requireSingleton().getInstanceByName(SyxGame.INSTANCE_NAME) == null) {
-                Intent prepare = new Intent(this, SyxStartActivity.class);
-                prepare.putExtra(SyxStartActivity.EXTRA_THEN_OPEN_SETTINGS, true);
-                prepare.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(prepare);
-                finish();
-                return;
-            }
+            // The settings of the first instance - renderer, resolution, JVM arguments. With no
+            // instance yet there are none: the launcher's home screen offers New instance instead.
+            java.util.List<com.udarmolota.syxdroid.game.GameInstance> all =
+                    GameInstanceManager.requireSingleton().getInstances();
+            if (all.isEmpty()) return;
+            String first = all.get(0).getName();
             // Posted: the navigation graph is attached once the host fragment is created.
             binding.getRoot().post(() -> {
                 Bundle args = new Bundle();
-                args.putString(com.udarmolota.syxdroid.fragments.SettingsFragment.ARG_INSTANCE, SyxGame.INSTANCE_NAME);
+                args.putString(com.udarmolota.syxdroid.fragments.SettingsFragment.ARG_INSTANCE, first);
                 navController.navigate(R.id.action_open_instance_settings, args);
             });
         } else if (ACTION_SEND_BUG_REPORT.equals(action)) {

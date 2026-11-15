@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Bottom bar of the launcher (as in RimDroid). Item ids are the destination ids, so NavigationUI
-     switches between them and highlights the current one. A "Game" tab (download from Steam/GOG)
-     and a "Mods" tab are planned next. -->
+     switches between them and highlights the current one. A "Mods" tab is planned next. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/launcher_fragment"
         android:icon="@drawable/ic_nav_home"
         android:title="@string/bottom_nav_home" />
+    <item
+        android:id="@+id/download_fragment"
+        android:icon="@drawable/ic_nav_game"
+        android:title="@string/bottom_nav_game" />
     <item
         android:id="@+id/transfer_fragment"
         android:icon="@drawable/ic_nav_transfer"

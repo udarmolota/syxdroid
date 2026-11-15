@@ -408,8 +408,8 @@
     <string name="launcher_empty_body">Чтобы начать играть, создайте инстанс — установленную копию Project Zomboid. Добавьте файлы игры кнопкой + вверху или скачайте игру из Steam или GOG через боковое меню. Загрузку из Steam сначала нужно упаковать в .zip; из GOG после загрузки нажмите «Создать инстанс».</string>
     <string name="launcher_empty_quick_start">Быстрый старт</string>
     <string name="deephall_empty_title">Songs of Syx ещё не импортирована</string>
-    <string name="deephall_empty_body">В SyxDroid нет самой игры. Нажмите кнопку ниже и выберите свою копию: папку игры или её zip-архив.</string>
-    <string name="deephall_empty_start">Импортировать игру</string>
+    <string name="deephall_empty_body">В SyxDroid нет самой игры. Нажмите кнопку и выберите zip-архив своей копии Songs of Syx или скачайте её из Steam на вкладке «Игра».</string>
+    <string name="deephall_empty_start">Новый экземпляр</string>
     <string name="game_loading">Игра загружается…</string>
     <string name="game_loading_preparing_files">При первом запуске и после обновления игра готовит свои файлы. На некоторых телефонах это занимает несколько минут.</string>
 
@@ -516,4 +516,44 @@
     <string name="bug_report_save_failed">Не удалось сохранить отчёт: %1$s</string>
     <string name="bug_report_no_mail_use_file">Почтовое приложение не найдено. Сохраните отчёт в файл и отправьте его с другого устройства.</string>
     <string name="no_instances">Songs of Syx ещё не импортирована</string>
+    <!-- Вкладка «Игра»: скачивание своей копии Songs of Syx из Steam -->
+    <string name="bottom_nav_game">Игра</string>
+    <string name="steam_title">Скачать из Steam</string>
+    <string name="steam_intro">Скачайте свою копию Songs of Syx из Steam прямо на телефон, без ПК. Нужен аккаунт Steam, на котором есть игра. Игра сохраняется zip-архивом в Загрузки/SyxDroid (около 330 МБ; на время загрузки нужно около 500 МБ свободного места). Потом создайте из него экземпляр — здесь же или позже кнопкой +.</string>
+    <string name="steam_username">Логин Steam</string>
+    <string name="steam_password">Пароль</string>
+    <string name="steam_privacy">Логин и пароль уходят только в Steam, для этого одного входа, и не сохраняются. Steam попросит подтвердить вход в приложении Steam Mobile или ввести код Steam Guard.</string>
+    <string name="steam_download">Скачать</string>
+    <string name="steam_cancel">Отмена</string>
+    <string name="steam_progress_title">Ход загрузки</string>
+    <string name="steam_log_empty">Пока ничего.</string>
+    <string name="steam_need_credentials">Введите логин и пароль Steam.</string>
+    <string name="steam_notification">Загрузка Songs of Syx из Steam</string>
+    <string name="steam_tip_network">Совет: оставайтесь в одной сети (Wi-Fi или мобильная), пока загрузка не закончится; переключение может сбросить вход.</string>
+    <string name="steam_approve_in_app">Подтвердите вход в приложении Steam Mobile…</string>
+    <string name="steam_resuming">Найдена незаконченная загрузка: продолжаю с того же места…</string>
+    <string name="steam_downloading">Загрузка файлов игры…</string>
+    <string name="steam_importing">Загрузка закончена.</string>
+    <string name="steam_done">Сохранено в %1$s (%2$d МБ). Создайте из него экземпляр сейчас или позже кнопкой + на Главной.</string>
+    <string name="steam_done_title">Готово</string>
+    <string name="steam_failed_title">Загрузка остановлена</string>
+    <string name="steam_cancelled">Загрузка отменена. При повторном запуске она продолжится с того же места.</string>
+    <string name="steam_stopped">Остановилось, не закончив. Попробуйте ещё раз: загрузка продолжится с того же места.</string>
+    <string name="steam_auth_failed">Не удалось войти в Steam: %1$s</string>
+    <string name="steam_connection_lost">Связь со Steam потеряна. Попробуйте ещё раз: загрузка продолжится. %1$s</string>
+    <string name="steam_download_failed">Загрузка не удалась: %1$s</string>
+    <string name="steam_no_game_files">Steam не прислал файлов Songs of Syx. Есть ли игра на этом аккаунте?</string>
+    <string name="steam_guard_title">Steam Guard</string>
+    <string name="steam_guard_app">Введите код из приложения Steam Mobile.</string>
+    <string name="steam_guard_email">Введите код, который Steam отправил на %1$s.</string>
+    <string name="steam_guard_wrong">Этот код не подошёл.</string>
+    <!-- Новый экземпляр и переход к нему после загрузки из Steam -->
+    <string name="syx_new_instance_title">Новый экземпляр</string>
+    <string name="syx_instance_created">%1$s готова. Запускайте кнопкой ▶.</string>
+    <string name="transfer_instance">Экземпляр</string>
+    <string name="steam_later">Позже</string>
+    <string name="steam_packing">Сохраняю игру zip-архивом в Загрузки/SyxDroid…</string>
+    <string name="steam_create_instance">Создать новый экземпляр</string>
+    <string name="syx_game_language">Язык игры</string>
+    <string name="syx_game_language_auto">Автоматически (язык телефона)</string>
 </resources>

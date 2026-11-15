@@ -264,13 +264,9 @@ public class LauncherFragment extends Fragment {
         };
         binding.gameInstancesRv.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.gameInstancesRv.setAdapter(adapter);
-        // Deephall: no instance means the game has not been unpacked yet; the start screen does that
-        // and then starts the game (it was Zomdroid's quick start guide for Project Zomboid)
-        binding.launcherEmptyQuickStartBtn.setOnClickListener(v -> {
-            android.content.Intent start = new android.content.Intent(requireContext(), com.udarmolota.syxdroid.SyxStartActivity.class);
-            start.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(start);
-        });
+        // No instance yet: the empty card's button picks the game zip, like "+"
+        binding.launcherEmptyQuickStartBtn.setOnClickListener(v ->
+                ((com.udarmolota.syxdroid.LauncherActivity) requireActivity()).pickGameZip());
         updateEmptyState();
 
         binding.gameInstancesRv.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
@@ -299,7 +295,7 @@ public class LauncherFragment extends Fragment {
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 if (menuItem.getItemId() == R.id.action_new_game_instance) {
-                    Navigation.findNavController(view).navigate(R.id.new_game_instance_fragment);
+                    ((com.udarmolota.syxdroid.LauncherActivity) requireActivity()).pickGameZip();
                     return true;
                 }
                 if (menuItem.getItemId() == R.id.action_open_wiki_help) {
@@ -459,6 +455,14 @@ public class LauncherFragment extends Fragment {
     private void showPostInstallSetupDialog(String presetName, String gpuVendor,
                                             String instanceName) {
         if (presetName == null) return;
+        // Songs of Syx: the new instance already carries its settings (SyxGame.setUpNewInstance);
+        // the Project Zomboid preset dialog below has nothing to offer it.
+        if (com.udarmolota.syxdroid.SyxGame.PRESET_NAME.equals(presetName)) {
+            android.widget.Toast.makeText(requireContext(),
+                    getString(R.string.syx_instance_created, instanceName),
+                    android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
 
         // A dialog used to stand here asking non-Qualcomm users to pick between NG_GL4ES and ZINK,
         // and it returned early - so this whole screen never ran for exactly the people it was

@@ -11,13 +11,19 @@ navigationFragment = "2.6.0"
 navigationUi = "2.6.0"
 commonsIo = "2.18.0"
 commonsCompress = "1.27.1"
-xz = "1.10"
+xz = "1.11"
 legacySupportV4 = "1.0.0"
 # Must match the LWJGL classes inside SongsOfSyx.jar (org.lwjgl.Version 3.4.1) and the bionic
 # natives in assets/bundles/libs.tar.xz (lwjgl-3.4.1/).
 lwjgl = "3.4.1"
 # Bytecode library for syxagent; 9.8 reads class files up to Java 25.
 asm = "9.8"
+# In-app Steam download (JavaSteam + its DepotDownloader), as in RimDroid. bouncycastle and
+# protobuf are JavaSteam's optional deps, at the versions it was built against.
+javasteam = "1.8.0"
+bouncycastle = "1.83"
+protobuf = "4.31.1"
+zstdJni = "1.5.7-6"
 
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
@@ -40,6 +46,11 @@ lwjgl-openal = { group = "org.lwjgl", name = "lwjgl-openal", version.ref = "lwjg
 lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjgl" }
 lwjgl-stb = { group = "org.lwjgl", name = "lwjgl-stb", version.ref = "lwjgl" }
 asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
+javasteam = { group = "in.dragonbra", name = "javasteam", version.ref = "javasteam" }
+javasteam-depotdownloader = { group = "in.dragonbra", name = "javasteam-depotdownloader", version.ref = "javasteam" }
+bouncycastle = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
+protobuf-java = { group = "com.google.protobuf", name = "protobuf-java", version.ref = "protobuf" }
+zstd-jni = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstdJni" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

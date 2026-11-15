@@ -190,9 +190,10 @@ public class GameLauncher {
             // SyxAgent: rectangle samplers -> 2D for GLES, no child java processes (see
             // syxagent/). Each change can be switched off with -Dsyx.agent.*=false.
             jvmArgs.add("-javaagent:" + homePath + "/" + C.deps.RUNTIME + "/syxagent.jar");
-            // The game's own settings file: borderless mode and, unless the player picked one in
-            // the game's options, the largest UI scale the screen allows (SyxGameSettings).
-            com.udarmolota.syxdroid.game.SyxGameSettings.apply(gameInstance.getHomePath());
+            // The game's own settings file: borderless mode, its UI scale off (the render
+            // resolution sets the UI size) and the language picked in this instance's settings.
+            com.udarmolota.syxdroid.game.SyxGameSettings.apply(gameInstance.getHomePath(),
+                    com.udarmolota.syxdroid.game.GameLanguages.resolve(settings.getGameLanguage(), gameInstance));
             // Heap: no -Xmx from the launcher means the JVM picks a quarter of RAM; the game's own
             // desktop default is 4096m. The heap preset in the settings (or the player's own
             // -Xmx below) decides; see PLAN.md risk R4.

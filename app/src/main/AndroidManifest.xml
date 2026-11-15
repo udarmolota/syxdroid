@@ -55,6 +55,11 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:excludeFromRecents="true">
         </activity>
+        <!-- Keeps the app at foreground priority while a Steam download runs (SteamGameDownloader) -->
+        <service
+            android:name=".DownloadKeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
         <service
             android:name=".InstallerService"
             android:exported="false"

@@ -240,6 +240,15 @@ dependencies {
     implementation(libs.xz)
     implementation(libs.legacy.support.v4)
 
+    // In-app Steam download of the player's own copy (SteamGameDownloader), as in RimDroid.
+    // xz 1.11 above is the version JavaSteam 1.8.0 was built against. zstd-jni as an AAR brings
+    // the arm64 native the depot chunks need; the plain jar has none for Android.
+    implementation(libs.javasteam)
+    implementation(libs.javasteam.depotdownloader)
+    implementation(libs.bouncycastle)
+    implementation(libs.protobuf.java)
+    implementation(variantOf(libs.zstd.jni) { artifactType("aar") })
+
     gameRuntime(libs.lwjgl.core)
     gameRuntime(libs.lwjgl.glfw)
     gameRuntime(libs.lwjgl.jemalloc)

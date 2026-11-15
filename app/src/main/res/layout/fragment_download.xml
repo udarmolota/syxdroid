@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Game page (DownloadFragment): download the player's own Songs of Syx from Steam, then it is
+     imported. Sign-in card, the buttons, progress and a log of what happens. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dl_scroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/AppTheme.TransferCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/AppTheme.TransferCardTitle"
+                    android:text="@string/steam_title" />
+
+                <TextView
+                    style="@style/AppTheme.TransferCardHint"
+                    android:text="@string/steam_intro" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/dl_user_til"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="@string/steam_username">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/dl_user_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="yes"
+                        android:autofillHints="username"
+                        android:inputType="text"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/dl_pass_til"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/steam_password"
+                    app:endIconMode="password_toggle"
+                    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/dl_pass_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="yes"
+                        android:autofillHints="password"
+                        android:inputType="textPassword"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    style="@style/AppTheme.TransferCardHint"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/steam_privacy" />
+
+                <LinearLayout
+                    style="@style/AppTheme.TransferButtonRow"
+                    android:layout_marginTop="4dp">
+
+                    <Button
+                        android:id="@+id/dl_start_btn"
+                        style="@style/AppTheme.TransferButton"
+                        android:text="@string/steam_download" />
+
+                    <Button
+                        android:id="@+id/dl_cancel_btn"
+                        style="@style/AppTheme.TransferButton.Outlined"
+                        android:text="@string/steam_cancel" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/AppTheme.TransferCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/AppTheme.TransferCardTitle"
+                    android:text="@string/steam_progress_title" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/dl_progress_lpi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/dl_log_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textIsSelectable="true"
+                    android:textSize="11sp"
+                    android:text="@string/steam_log_empty"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

@@ -9,9 +9,6 @@
          one destination resolves only from that destination, so a drawer tap anywhere but the home
          screen used to throw IllegalArgumentException. The ids are unchanged. -->
     <action
-        android:id="@+id/action_open_new_game_instance_fragment"
-        app:destination="@id/new_game_instance_fragment" />
-    <action
         android:id="@id/action_open_settings_fragment"
         app:destination="@id/app_settings_fragment"/>
     <action
@@ -44,6 +41,12 @@
 
     <!-- The bottom bar's pages (as in RimDroid): the bar's item ids are these destination ids. -->
     <fragment
+        android:id="@+id/download_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.DownloadFragment"
+        android:label="@string/steam_title"
+        tools:layout="@layout/fragment_download" />
+
+    <fragment
         android:id="@+id/transfer_fragment"
         android:name="com.udarmolota.syxdroid.fragments.TransferFragment"
         android:label="@string/transfer_title"
@@ -67,13 +70,6 @@
         android:name="com.udarmolota.syxdroid.fragments.LauncherFragment"
         android:label="@string/fragment_label_launcher"
         tools:layout="@layout/fragment_launcher" />
-
-    <fragment
-        android:id="@+id/new_game_instance_fragment"
-        android:name="com.udarmolota.syxdroid.fragments.NewGameInstanceFragment"
-        android:label="@string/fragment_label_new_game_instance"
-        tools:layout="@layout/fragment_new_game_instance">
-    </fragment>
 
     <!-- Per-instance launch settings, opened by the gear on an instance card. The argument is
          nullable so the screen still works if something navigates here without one; it then reads

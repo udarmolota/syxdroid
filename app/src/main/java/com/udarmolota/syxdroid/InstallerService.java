@@ -235,24 +235,30 @@ public class InstallerService extends Service implements TaskProgressListener {
             return;
         }
 
-        Uri gameFilesArchiveUri = intent.getParcelableExtra(EXTRA_ARCHIVE_URI);
-        if (gameFilesArchiveUri == null) {
+        // Where the game comes from (SyxGame.createInstanceFromZip): a zip the player picked with
+        // "+", or the Steam download's zip in Download/SyxDroid.
+        String importKind = intent.getStringExtra(EXTRA_IMPORT_KIND);
+        Uri gameFilesUri = intent.getParcelableExtra(EXTRA_ARCHIVE_URI);
+        if (gameFilesUri == null || importKind == null) {
             finishWithError(getString(R.string.dialog_title_failed_to_create_instance),
-                    "Game files archive URI intent extra is missing");
+                    "Game files source intent extras are missing");
             return;
         }
 
         executorService.submit(() -> {
             try {
-                // The game arrives as the folder it runs from: nothing to lift out of wrapper
-                // folders, no native layout to normalise and no classes to patch.
-                installGameFromZip(gameInstance, gameFilesArchiveUri);
+                SyxImporter.importGame(this, gameFilesUri, importKind, gameInstance, this);
+                SyxGame.setUpNewInstance(this, gameInstance);
             } catch (Exception e) {
-                finishWithError(getString(R.string.dialog_title_failed_to_create_instance), e.toString());
+                // A half-made instance would sit in the list with no game in it: take it away.
+                try {
+                    GameInstanceManager.requireSingleton().unregisterInstance(gameInstance);
+                    FileUtils.deleteDirectory(new File(gameInstance.getHomePath()));
+                } catch (Exception ignored) {}
+                String detail = e instanceof IOException && e.getMessage() != null ? e.getMessage() : e.toString();
+                finishWithError(getString(R.string.dialog_title_failed_to_create_instance), detail);
                 return;
             }
-
-            GameInstanceManager.requireSingleton().markInstallationFinished(gameInstance);
             finish(getString(R.string.dialog_title_instance_created), null);
         });
     }

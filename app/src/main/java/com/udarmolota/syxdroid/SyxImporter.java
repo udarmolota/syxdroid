@@ -92,6 +92,16 @@ final class SyxImporter {
         }
     }
 
+    /**
+     * A game folder already in the app's storage (a finished Steam download): checked, then its
+     * SongsOfSyx.jar and base/ are moved into the game dir. Moving, not copying: same filesystem,
+     * so no second ~300 MB on disk. The caller deletes what is left (the desktop JRE and launcher).
+     */
+    static void importFromDownloadedDir(@NonNull File dir, @NonNull GameInstance instance) throws IOException {
+        verify(dir);
+        replaceGameFiles(dir, new File(instance.getGamePath()));
+    }
+
     /** Whether a path relative to the game root is one of the files we take. */
     private static boolean isWanted(String relPath) {
         return relPath.equals(GAME_JAR) || relPath.startsWith(BASE_DIR + "/");

@@ -32,6 +32,9 @@ import java.util.regex.Pattern;
  *       borderless mode ({@code screen / (1 + 0.05 * scale)}) is switched off, because the
  *       launcher's render resolution (RenderResolution) already sets the size the game draws at,
  *       and with it the UI size, as in RimDroid. Both together would only stack.</li>
+ *   <li>{@code LANGUAGE: "<code>"}: the language picked in the instance's settings
+ *       (GameLanguages), "" for English. The game's own launcher, which SyxDroid skips, was the
+ *       only place to choose it.</li>
  * </ul>
  */
 public final class SyxGameSettings {
@@ -40,16 +43,22 @@ public final class SyxGameSettings {
 
     static final String KEY_SCREEN_MODE = "SCREEN_MODE";
     static final String KEY_SCALE = "WIDOW_SCALE";
+    static final String KEY_LANGUAGE = "LANGUAGE";
     static final int SCREEN_MODE_BORDERLESS = 0;
     /** The game's own UI scale off: the render resolution decides the UI size. */
     static final int GAME_SCALE_OFF = 0;
 
+    /** A string setting: KEY: "value", */
+    private static final Pattern STRING_LINE = Pattern.compile("^\\s*([A-Z0-9_]+)\\s*:\\s*\"(.*)\"\\s*,?\\s*$");
     private static final Pattern INT_LINE = Pattern.compile("^(\\s*)([A-Z0-9_]+)(\\s*:\\s*)(-?\\d+)(\\s*,?\\s*)$");
 
     private SyxGameSettings() {}
 
-    /** Applies the settings above to the instance whose home is homePath. Never throws. */
-    public static void apply(String homePath) {
+    /**
+     * Applies the settings above to the instance whose home is homePath; language is the game's
+     * LANGUAGE value ("" = English). Never throws.
+     */
+    public static void apply(String homePath, String language) {
         File file = new File(homePath, RELATIVE_PATH);
         try {
             List<String> lines = file.isFile()
@@ -63,12 +72,16 @@ public final class SyxGameSettings {
                 if (m.matches()) {
                     found.put(m.group(2), Integer.parseInt(m.group(4)));
                     lineOf.put(m.group(2), i);
+                    continue;
                 }
+                Matcher sm = STRING_LINE.matcher(lines.get(i));
+                if (sm.matches()) lineOf.put(sm.group(1), i);
             }
 
             boolean changed = false;
             changed |= put(lines, lineOf, KEY_SCREEN_MODE, SCREEN_MODE_BORDERLESS);
             changed |= put(lines, lineOf, KEY_SCALE, GAME_SCALE_OFF);
+            changed |= putLine(lines, lineOf, KEY_LANGUAGE, KEY_LANGUAGE + ": \"" + language.replace("\"", "") + "\",");
 
             if (!changed) return;
             File dir = file.getParentFile();
@@ -76,7 +89,8 @@ public final class SyxGameSettings {
                 throw new IOException("Failed to create " + dir);
             Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
             Log.i(TAG, "updated " + file + ": " + KEY_SCREEN_MODE + "=" + SCREEN_MODE_BORDERLESS
-                    + ", " + KEY_SCALE + "=" + GAME_SCALE_OFF + " (was " + found.get(KEY_SCALE) + ")");
+                    + ", " + KEY_SCALE + "=" + GAME_SCALE_OFF + " (was " + found.get(KEY_SCALE) + ")"
+                    + ", " + KEY_LANGUAGE + "=\"" + language + "\"");
         } catch (IOException | RuntimeException e) {
             // The game still starts with its own defaults; only the UI is smaller.
             Log.w(TAG, "could not update " + file, e);
@@ -85,8 +99,12 @@ public final class SyxGameSettings {
 
     /** Sets key to value, replacing its line or appending one. Returns whether anything changed. */
     private static boolean put(List<String> lines, Map<String, Integer> lineOf, String key, int value) {
+        return putLine(lines, lineOf, key, key + ": " + value + ",");
+    }
+
+    /** Sets key's whole line, replacing it or appending one. Returns whether anything changed. */
+    private static boolean putLine(List<String> lines, Map<String, Integer> lineOf, String key, String line) {
         Integer index = lineOf.get(key);
-        String line = key + ": " + value + ",";
         if (index == null) {
             lines.add(line);
             lineOf.put(key, lines.size() - 1);
