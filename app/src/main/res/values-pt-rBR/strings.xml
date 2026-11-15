@@ -4,7 +4,6 @@
     <string name="percentage_format" translatable="false">%d%%</string>
 
     <string name="legal_notice_title">Aviso legal</string>
-    <string name="legal_notice_message">Este launcher é uma ferramenta de terceiros e requer os arquivos originais do Project Zomboid para funcionar. Você deve possuir uma cópia licenciada do jogo para usar este software. O desenvolvedor deste launcher não é afiliado aos criadores do jogo original e não assume nenhuma responsabilidade por quaisquer consequências legais decorrentes do uso deste software.</string>
 
     <string name="fragment_label_launcher">Launcher</string>
     <string name="fragment_label_new_game_instance">Nova instância do jogo</string>
@@ -89,13 +88,11 @@
     <string name="game_instance_manage_storage">Gerenciar armazenamento</string>
     <string name="game_instance_delete">Excluir</string>
 
-    <string name="donate_message">Gostando do app e quer nos apoiar? \n\nAgora mantido e desenvolvido por ko-fi.com/udarmolota, \ncriado por ko-fi.com/liamelui. \n\nColaboradores: \nshimux0, Wakort, LeHiepDuy, deadgamer182, Liko, Willing-Run-8987, Willing-Upstairs-580.</string>
 
     <string name="app_aborted">O aplicativo encontrou um problema inesperado e foi encerrado</string>
     <string name="share_logs">Compartilhar arquivo de log</string>
 
     <string name="delete_game_instance">Todos os arquivos do jogo e dados (saves, mods, servidores favoritos, etc.) associados a esta instância serão perdidos permanentemente</string>
-    <string name="game_files_missing">Certifique-se de que ProjectZomboid64 está no nível raiz do arquivo .zip usado para instalação. Siga o guia na wiki para garantir que os arquivos estejam empacotados corretamente</string>
 
     <!-- Gamepad Mapper Strings -->
     <string name="gamepad_mapper_title">Mapeamento de Botões do Gamepad</string>
@@ -201,11 +198,6 @@
 
     <!-- Custom Driver import/export -->
     <string name="install_driver_menu">Importar/Exportar Driver Personalizado</string>
-    <string name="install_driver_so_label">Driver Vulkan personalizado (arquivo .so)</string>
-    <string name="install_driver_warning">Substitui o driver personalizado carregado anteriormente. Use por sua conta e risco.</string>
-    <string name="install_driver_import">Importar</string>
-    <string name="install_driver_export">Exportar</string>
-    <string name="install_driver_wrong_extension">Por favor, selecione um arquivo .so</string>
 
     <!-- InstallerService task titles -->
     <string name="dialog_title_importing_driver">Importando driver personalizado…</string>
@@ -217,14 +209,11 @@
 
     <string name="export_log_menu">Exportar Log do Jogo</string>
     <string name="export_log_export">Exportar console.txt</string>
-    <string name="export_log_not_found">Arquivo de log não encontrado. O jogo pode não ter sido executado ainda, ou travou antes de criar a pasta Zomboid.</string>
     <string name="dialog_title_exporting_log">Exportando log…</string>
     <string name="dialog_title_log_exported">Log exportado</string>
     <string name="dialog_title_failed_to_export_log">Falha ao exportar log</string>
 
     <string name="nav_menu_reddit">Reddit</string>
-    <string name="reddit_dialog_title">Zomdroid no Reddit</string>
-    <string name="reddit_message">Junte-se à nossa comunidade no Reddit:\nhttps://www.reddit.com/r/zomdroid</string>
 
     <string name="settings_env_vars">Variáveis de ambiente</string>
     <string name="settings_env_vars_hint">Por exemplo: TU_DEBUG=nogmem</string>
@@ -246,7 +235,6 @@
     <string name="controls_editor_layout_restored">Layout original restaurado</string>
 
     <!-- Version update -->
-    <string name="version_check_title">Zomdroid by udar_molota</string>
     <string name="version_check_up_to_date">Você tem a versão mais recente: %1$s</string>
     <string name="version_check_update_available">Instalada: %1$s\nDisponível: %2$s\n%3$s</string>
     <string name="version_check_error">Não foi possível verificar atualizações\nVersão atual: %1$s</string>
@@ -305,9 +293,6 @@
     <string name="install_controls_group_file">Arquivo de layout</string>
     <string name="install_controls_group_export">Exportar layout</string>
     <string name="install_controls_export_hint">Salvar o layout atual como arquivo ZIP.</string>
-    <string name="install_driver_group_import">Importar driver</string>
-    <string name="install_driver_group_export">Exportar driver</string>
-    <string name="install_driver_export_hint">Salvar o driver personalizado instalado como arquivo .so.</string>
     <string name="export_log_group_export">Exportar log</string>
     <string name="export_log_hint">Exporta o arquivo console.txt da instância selecionada.</string>
 
@@ -339,15 +324,7 @@
     <string name="extracting">Extraindo…</string>
 
     <!-- ===== CONTROLS EDITOR LAUNCH strings ===== -->
-    <string name="controls_editor_bg_group">Imagem de fundo (opcional)</string>
-    <string name="controls_editor_bg_hint">Carregue um screenshot do jogo como fundo do editor. Fica mais fácil posicionar os botões exatamente onde quiser.</string>
-    <string name="controls_editor_bg_clear">Remover fundo</string>
-    <string name="controls_editor_bg_saved">Imagem de fundo salva</string>
-    <string name="controls_editor_bg_cleared">Fundo removido</string>
     <string name="controls_editor_bg_error">Falha ao salvar o fundo: %1$s</string>
-    <string name="controls_editor_open_group">Editor</string>
-    <string name="controls_editor_open_hint">Abra o editor de controles para mover, redimensionar e configurar os botões na tela.</string>
-    <string name="controls_editor_open_btn">Abrir editor</string>
 
     <!-- ===== ETO + collapsible strings ===== -->
 
@@ -407,9 +384,7 @@
     <string name="launcher_empty_body">Para começar a jogar, crie uma instância: uma cópia instalada de Project Zomboid. Adicione os arquivos do jogo com o + no topo ou baixe o jogo da Steam ou da GOG pelo menu lateral. Um download da Steam precisa ser compactado em .zip antes; da GOG, toque em “Criar uma instância” quando o download terminar.</string>
     <string name="launcher_empty_quick_start">Início rápido</string>
     <string name="deephall_update_channel">Novas versões</string>
-    <string name="deephall_update_title">Deephall %1$s foi lançado</string>
     <string name="deephall_update_text">Toque para ver as novidades e baixar.</string>
-    <string name="game_loading_update_available">Deephall %1$s foi lançado. Toque para ver as novidades.</string>
     <string name="settings_game_textures_title">Compressão</string>
     <string name="settings_game_textures_desc">Baixa usa um quarto da memória e carrega mais rápido, mas fica mais suave de perto. Ultra baixa reduz mais uma vez, para celulares em que o jogo ainda fica sem memória. Por padrão, celulares com menos de 6 GB de RAM usam Baixa. Vale a partir da próxima abertura.</string>
     <string name="settings_game_textures_none">Nenhuma</string>

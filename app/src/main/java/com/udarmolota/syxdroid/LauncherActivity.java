@@ -299,7 +299,7 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     private static JSONObject fetchLatestRelease() throws Exception {
-        URL url = new URL("https://api.github.com/repos/udarmolota/zomdroid/releases/latest");
+        URL url = new URL("https://api.github.com/repos/udarmolota/syxdroid/releases/latest");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty("Accept", "application/vnd.github+json");
         conn.setConnectTimeout(5000);
@@ -390,6 +390,9 @@ public class LauncherActivity extends AppCompatActivity {
      * Opens the controls editor straight away, as in RimDroid: one instance is taken as is, several
      * are offered in a dialog. No intermediate screen.
      */
+    /** A picture saved earlier as the editor's background (the old editor start screen saved it). */
+    private static final String EDITOR_BACKGROUND_FILENAME = "editor_background.jpg";
+
     public void openControlsEditor() {
         java.util.List<GameInstance> instances =
                 new java.util.ArrayList<>(GameInstanceManager.requireSingleton().getInstances());
@@ -415,7 +418,7 @@ public class LauncherActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ControlsEditorActivity.class);
         intent.putExtra(ControlsEditorActivity.EXTRA_INSTANCE_NAME, instance.getName());
         File bg = new File(instance.getHomePath(),
-                "game/controls/" + com.udarmolota.syxdroid.fragments.ControlsEditorLaunchFragment.BACKGROUND_FILENAME);
+                "game/controls/" + EDITOR_BACKGROUND_FILENAME);
         if (bg.isFile()) intent.putExtra(ControlsEditorActivity.EXTRA_BACKGROUND_PATH, bg.getAbsolutePath());
         startActivity(intent);
     }

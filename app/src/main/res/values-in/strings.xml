@@ -3,7 +3,6 @@
     <string name="percentage_format" translatable="false">%d%%</string>
 
     <string name="legal_notice_title">Pemberitahuan hukum</string>
-    <string name="legal_notice_message">Launcher ini adalah alat pihak ketiga dan memerlukan file asli Project Zomboid untuk berfungsi. Anda harus memiliki salinan game berlisensi untuk menggunakan perangkat lunak ini. Pengembang launcher ini tidak berafiliasi dengan pembuat game asli dan tidak bertanggung jawab atas konsekuensi hukum apapun yang timbul dari penggunaan perangkat lunak ini.</string>
 
     <string name="fragment_label_launcher">Launcher</string>
     <string name="fragment_label_new_game_instance">Instans game baru</string>
@@ -88,13 +87,11 @@
     <string name="game_instance_manage_storage">Kelola penyimpanan</string>
     <string name="game_instance_delete">Hapus</string>
 
-    <string name="donate_message">Enjoying the app and want to support us? \n\nMaintained and Developed by: ko-fi.com/udarmolota, \ncreator: ko-fi.com/liamelui.  \n\nContributors: \nshimux0, Wakort, LeHiepDuy, deadgamer182, Liko, Willing-Run-8987, Willing-Upstairs-580.</string>
 
     <string name="app_aborted">Aplikasi mengalami masalah tak terduga dan harus ditutup</string>
     <string name="share_logs">Bagikan file log</string>
 
     <string name="delete_game_instance">Semua file game dan data (simpanan, mod, server favorit, dll.) yang terkait dengan instans ini akan hilang secara permanen</string>
-    <string name="game_files_missing">Pastikan ProjectZomboid64 berada di level teratas arsip .zip yang digunakan untuk instalasi. Ikuti panduan di wiki untuk memastikan file dikemas dengan benar</string>
 
     <!-- Gamepad Mapper Strings -->
     <string name="gamepad_mapper_title">Pemetaan Tombol Gamepad</string>
@@ -201,11 +198,6 @@
 
     <!-- Custom Driver import/export -->
     <string name="install_driver_menu">Impor/Ekspor Driver Kustom</string>
-    <string name="install_driver_so_label">Driver Vulkan Kustom (file .so)</string>
-    <string name="install_driver_warning">Mengganti driver kustom yang sebelumnya dimuat. Gunakan dengan risiko sendiri.</string>
-    <string name="install_driver_import">Impor</string>
-    <string name="install_driver_export">Ekspor</string>
-    <string name="install_driver_wrong_extension">Pilih file .so</string>
 
     <!-- InstallerService task titles -->
     <string name="dialog_title_importing_driver">Mengimpor driver kustom…</string>
@@ -218,14 +210,11 @@
     <!-- Export log -->
     <string name="export_log_menu">Ekspor Log Game</string>
     <string name="export_log_export">Ekspor console.txt</string>
-    <string name="export_log_not_found">File log tidak ditemukan. Game mungkin belum pernah dijalankan, atau crash sebelum membuat folder Zomboid.</string>
     <string name="dialog_title_exporting_log">Mengekspor log…</string>
     <string name="dialog_title_log_exported">Log diekspor</string>
     <string name="dialog_title_failed_to_export_log">Gagal mengekspor log</string>
 
     <string name="nav_menu_reddit">Reddit</string>
-    <string name="reddit_dialog_title">Zomdroid di Reddit</string>
-    <string name="reddit_message">Gabung dengan komunitas kami di Reddit:\nhttps://www.reddit.com/r/zomdroid</string>
 
     <string name="settings_env_vars">Variabel lingkungan</string>
     <string name="settings_env_vars_hint">Misalnya: TU_DEBUG=nogmem</string>
@@ -247,7 +236,6 @@
     <string name="controls_editor_layout_restored">Tata letak asli dipulihkan</string>
 
     <!-- Version update -->
-    <string name="version_check_title">Zomdroid by udar_molota</string>
     <string name="version_check_up_to_date">Anda memiliki versi terbaru: %1$s</string>
     <string name="version_check_update_available">Installed: %1$s\nAvailable: %2$s\n%3$s</string>
     <string name="version_check_error">Could not check for updates\nCurrent version: %1$s</string>
@@ -306,9 +294,6 @@
     <string name="install_controls_group_file">Tata letak kontrol</string>
     <string name="install_controls_group_export">Ekspor tata letak</string>
     <string name="install_controls_export_hint">Simpan tata letak tombol Anda saat ini sebagai arsip ZIP.</string>
-    <string name="install_driver_group_import">Impor driver</string>
-    <string name="install_driver_group_export">Ekspor driver</string>
-    <string name="install_driver_export_hint">Simpan driver kustom yang terinstal sebagai file .so.</string>
     <string name="export_log_group_export">Ekspor log</string>
     <string name="export_log_hint">Mengekspor file log console.txt dari instans yang dipilih.</string>
 
@@ -340,15 +325,7 @@
     <string name="extracting">Mengekstrak…</string>
 
     <!-- ===== CONTROLS EDITOR LAUNCH strings ===== -->
-    <string name="controls_editor_bg_group">Gambar Latar (opsional)</string>
-    <string name="controls_editor_bg_hint">Muat tangkapan layar dari game sebagai latar editor. Memudahkan menempatkan tombol tepat di tempat yang Anda inginkan.</string>
-    <string name="controls_editor_bg_clear">Hapus latar</string>
-    <string name="controls_editor_bg_saved">Gambar latar disimpan</string>
-    <string name="controls_editor_bg_cleared">Latar dihapus</string>
     <string name="controls_editor_bg_error">Gagal menyimpan latar: %1$s</string>
-    <string name="controls_editor_open_group">Editor</string>
-    <string name="controls_editor_open_hint">Buka editor kontrol untuk menyeret, mengubah ukuran, dan mengonfigurasi tombol layar.</string>
-    <string name="controls_editor_open_btn">Buka editor</string>
 
     <!-- ===== ETO + collapsible strings ===== -->
 
@@ -408,9 +385,7 @@
     <string name="launcher_empty_body">Untuk mulai bermain, buat instance — salinan Project Zomboid yang terpasang. Tambahkan file game dengan tombol + di atas, atau unduh game dari Steam atau GOG lewat menu samping. Unduhan dari Steam harus dikemas dulu ke .zip; dari GOG, ketuk “Buat instance” setelah unduhan selesai.</string>
     <string name="launcher_empty_quick_start">Mulai cepat</string>
     <string name="deephall_update_channel">Versi baru</string>
-    <string name="deephall_update_title">Deephall %1$s sudah rilis</string>
     <string name="deephall_update_text">Ketuk untuk melihat yang baru dan mengunduhnya.</string>
-    <string name="game_loading_update_available">Deephall %1$s sudah rilis. Ketuk untuk melihat yang baru.</string>
     <string name="settings_game_textures_title">Kompresi</string>
     <string name="settings_game_textures_desc">Rendah memakai seperempat memori dan memuat lebih cepat, tetapi terlihat lebih lembut dari dekat. Sangat rendah memperkecilnya sekali lagi, untuk ponsel yang masih kehabisan memori. Secara bawaan, ponsel dengan RAM kurang dari 6 GB mendapat Rendah. Berlaku pada peluncuran berikutnya.</string>
     <string name="settings_game_textures_none">Tidak ada</string>

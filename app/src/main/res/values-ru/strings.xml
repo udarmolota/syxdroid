@@ -4,7 +4,8 @@
     <string name="percentage_format" translatable="false">%d%%</string>
 
     <string name="legal_notice_title">Правовое уведомление</string>
-    <string name="legal_notice_message">Этот лаунчер является сторонним инструментом и требует оригинальных файлов Project Zomboid для работы. Для использования этого программного обеспечения вы должны владеть лицензионной копией игры. Разработчик лаунчера не связан с создателями оригинальной игры и не несёт ответственности за какие-либо правовые последствия использования данного программного обеспечения.</string>
+    <string name="legal_notice_message">SyxDroid — сторонний лаунчер. Для работы ему нужны ваши собственные файлы Songs of Syx, частей игры в нём нет. Вы должны владеть легальной копией игры. SyxDroid не разрабатывается, не одобрен и никак не связан с Gamatron AB, создателями Songs of Syx; разработчик лаунчера не несёт ответственности за правовые последствия его использования.</string>
+    <string name="release_notes_body">Первая альфа SyxDroid: Songs of Syx на Android с вашей собственной копией игры.\n\n• Импорт игры из zip вашей копии (Steam, Windows или Linux) или загрузка из Steam на странице «Игра».\n\n• Несколько экземпляров, язык игры, разрешение рендера и ограничение частоты кадров в настройках экземпляра.\n\n• Экранное управление с редактором: кнопка «Управление» в нижней панели.\n\nЭто альфа, шероховатости будут. О проблемах пишите через «Сообщить об ошибке» в боковом меню.</string>
 
     <string name="fragment_label_launcher">Лаунчер</string>
     <string name="fragment_label_new_game_instance">Новый экземпляр игры</string>
@@ -89,13 +90,13 @@
     <string name="game_instance_manage_storage">Управление хранилищем</string>
     <string name="game_instance_delete">Удалить</string>
 
-    <string name="donate_message">Нравится приложение и хотите поддержать нас? \n\nРазвитие и поддержка: ko-fi.com/udarmolota, автор: ko-fi.com/liamelui. \n\nДругие участники: \nshimux0, Wakort, LeHiepDuy, deadgamer182, Liko, Willing-Run-8987, Willing-Upstairs-580.</string>
+    <string name="donate_message">Нравится SyxDroid и хотите поддержать?\n\nРазработка и поддержка: ko-fi.com/udarmolota\n\nОснова — Zomdroid от liamelui (ko-fi.com/liamelui).\nГрафика — MobileGlues от команды MobileGL-Dev (BZLZHH, Swung0x48, Tungstend и другие), в форке, который ведёт mepetz (Willing-Upstairs-580).</string>
 
     <string name="app_aborted">Приложение столкнулось с непредвиденной проблемой и было закрыто</string>
     <string name="share_logs">Поделиться файлом логов</string>
 
     <string name="delete_game_instance">Все файлы игры и данные (сохранения, моды, избранные серверы и т.д.), связанные с этим экземпляром, будут безвозвратно удалены</string>
-    <string name="game_files_missing">Убедитесь, что ProjectZomboid64 находится на верхнем уровне .zip архива, использованного при установке. Следуйте гайду на вики для правильной упаковки файлов</string>
+    <string name="game_files_missing">Файлы игры не найдены. В импортируемом zip или папке должны быть SongsOfSyx.jar и папка base из вашей копии Songs of Syx.</string>
 
     <!-- Gamepad Mapper Strings -->
     <string name="gamepad_mapper_title">Настройка кнопок геймпада</string>
@@ -201,11 +202,6 @@
 
     <!-- Custom Driver import/export -->
     <string name="install_driver_menu">Импорт/экспорт драйвера</string>
-    <string name="install_driver_so_label">Пользовательский драйвер Vulkan (файл .so)</string>
-    <string name="install_driver_warning">Заменяет ранее загруженный драйвер. Используйте на свой страх и риск.</string>
-    <string name="install_driver_import">Импорт</string>
-    <string name="install_driver_export">Экспорт</string>
-    <string name="install_driver_wrong_extension">Пожалуйста, выберите файл .so</string>
 
     <!-- InstallerService task titles -->
     <string name="dialog_title_importing_driver">Импорт драйвера…</string>
@@ -217,14 +213,14 @@
 
     <string name="export_log_menu">Экспорт лога игры</string>
     <string name="export_log_export">Экспортировать console.txt</string>
-    <string name="export_log_not_found">Файл лога не найден. Возможно, игра ещё не запускалась или вылетела до создания папки Zomboid.</string>
+    <string name="export_log_not_found">Файл лога не найден. Возможно, игра ещё не запускалась или вылетела, не успев его записать.</string>
     <string name="dialog_title_exporting_log">Экспорт лога…</string>
     <string name="dialog_title_log_exported">Лог экспортирован</string>
     <string name="dialog_title_failed_to_export_log">Не удалось экспортировать лог</string>
 
     <string name="nav_menu_reddit">Reddit</string>
-    <string name="reddit_dialog_title">Zomdroid на Reddit</string>
-    <string name="reddit_message">Mы на Reddit:\nhttps://www.reddit.com/r/zomdroid</string>
+    <string name="reddit_dialog_title">UdarMolotaDev на Reddit</string>
+    <string name="reddit_message">Новости, вопросы и сообщения об ошибках:\nhttps://www.reddit.com/r/UdarMolotaDev/</string>
 
     <string name="settings_env_vars">Переменные окружения</string>
     <string name="settings_env_vars_hint">Например: TU_DEBUG=nogmem</string>
@@ -246,7 +242,7 @@
     <string name="controls_editor_layout_restored">Исходная раскладка восстановлена</string>
 
     <!-- Version update -->
-    <string name="version_check_title">Zomdroid by udar_molota</string>
+    <string name="version_check_title">SyxDroid by udar_molota</string>
     <string name="version_check_up_to_date">Актуальная версия: %1$s</string>
     <string name="version_check_update_available">Установлена: %1$s\nДоступна: %2$s\n%3$s</string>
     <string name="version_check_error">Не удалось проверить обновления\nТекущая версия: %1$s</string>
@@ -305,9 +301,6 @@
     <string name="install_controls_group_file">Файл раскладки</string>
     <string name="install_controls_group_export">Экспорт раскладки</string>
     <string name="install_controls_export_hint">Сохранить текущую раскладку кнопок в ZIP-архив.</string>
-    <string name="install_driver_group_import">Импорт драйвера</string>
-    <string name="install_driver_group_export">Экспорт драйвера</string>
-    <string name="install_driver_export_hint">Сохранить установленный кастомный драйвер как .so файл.</string>
     <string name="export_log_group_export">Экспорт лога</string>
     <string name="export_log_hint">Экспортирует файл console.txt из выбранного экземпляра.</string>
 
@@ -339,15 +332,7 @@
     <string name="extracting">Извлечение…</string>
 
     <!-- ===== CONTROLS EDITOR LAUNCH strings ===== -->
-    <string name="controls_editor_bg_group">Фоновое изображение (необязательно)</string>
-    <string name="controls_editor_bg_hint">Загрузите скриншот из игры как фон редактора. Так легче расставить кнопки именно там, где нужно.</string>
-    <string name="controls_editor_bg_clear">Удалить фон</string>
-    <string name="controls_editor_bg_saved">Фоновое изображение сохранено</string>
-    <string name="controls_editor_bg_cleared">Фон удалён</string>
     <string name="controls_editor_bg_error">Не удалось сохранить фон: %1$s</string>
-    <string name="controls_editor_open_group">Редактор</string>
-    <string name="controls_editor_open_hint">Откройте редактор управления, чтобы перемещать, масштабировать и настраивать экранные кнопки.</string>
-    <string name="controls_editor_open_btn">Открыть редактор</string>
 
     <!-- ===== ETO + collapsible strings ===== -->
 
@@ -417,11 +402,10 @@
     <string name="deephall_preparing">Подготовка игры…</string>
     <string name="deephall_installing_game">Установка файлов игры…</string>
     <string name="deephall_prepare_failed">Не удалось подготовить игру</string>
-    <string name="deephall_open_launcher">Открыть лаунчер</string>
     <string name="deephall_update_channel">Новые версии</string>
-    <string name="deephall_update_title">Вышла Deephall %1$s</string>
+    <string name="deephall_update_title">Вышел SyxDroid %1$s</string>
     <string name="deephall_update_text">Нажмите, чтобы посмотреть, что нового, и скачать.</string>
-    <string name="game_loading_update_available">Вышла Deephall %1$s. Нажмите, чтобы посмотреть, что нового.</string>
+    <string name="game_loading_update_available">Вышел SyxDroid %1$s. Нажмите, чтобы посмотреть, что нового.</string>
     <string name="shortcut_settings_short">Настройки</string>
     <string name="shortcut_settings_long">Настройки</string>
     <string name="shortcut_bug_report_short">Отчёт</string>
@@ -430,14 +414,7 @@
     <string name="shortcut_export_saves_long">Экспорт сохранений</string>
     <string name="shortcut_import_saves_short">Импорт</string>
     <string name="shortcut_import_saves_long">Импорт сохранений</string>
-    <string name="saves_none">Сохранений пока нет</string>
     <string name="saves_no_instance">Игра ещё не установлена: сначала запустите её</string>
-    <string name="saves_import_game_running">Закройте игру перед импортом сохранений</string>
-    <string name="saves_exported">Экспортировано сохранений: %1$d</string>
-    <string name="saves_export_failed">Не удалось экспортировать: %1$s</string>
-    <string name="saves_imported">Импортировано сохранений: %1$d. Сохранение с тем же именем оставлено как .bak</string>
-    <string name="saves_import_nothing">В файле нет сохранений .save</string>
-    <string name="saves_import_failed">Не удалось импортировать: %1$s</string>
     <string name="shortcut_controls_short">Раскладка</string>
     <string name="shortcut_controls_long">Экранные кнопки</string>
     <string name="shortcut_saves_short">Сохранения</string>
@@ -448,7 +425,8 @@
     <string name="editor_reset">Сброс</string>
     <string name="editor_done">Готово</string>
     <string name="editor_move_toolbar">Потяните, чтобы передвинуть панель</string>
-    <string name="editor_reset_confirm">Вернуть все экранные кнопки к раскладке Deephall?</string>
+    <string name="editor_reset_confirm">Вернуть все экранные кнопки к стандартной раскладке?</string>
+    <string name="rimdroid_dialog_message">RimDroid запускает RimWorld на Android так же, как SyxDroid запускает Songs of Syx. Тот же автор, тот же подход.\n\nhttps://github.com/udarmolota/RimDroid/releases</string>
     <string name="editor_game_running">Закройте игру, прежде чем менять кнопки</string>
     <string name="settings_game_textures_title">Сжатие</string>
     <string name="settings_game_textures_desc">«Низко» занимает вчетверо меньше памяти и грузится быстрее, но вблизи мягче. «Ультра низко» сжимает ещё вдвое: для телефонов, где игре всё равно не хватает памяти. По умолчанию телефоны с памятью меньше 6 ГБ получают «Низко». Действует со следующего запуска.</string>
@@ -456,10 +434,6 @@
     <string name="settings_game_textures_low">Низко</string>
     <string name="settings_game_textures_ultra">Ультра низко</string>
     <!-- SyxDroid: импорт своей копии Songs of Syx -->
-    <string name="syx_import_title">Импорт Songs of Syx</string>
-    <string name="syx_import_body">В SyxDroid нет самой игры. Выберите свою копию: папку игры (ту, где лежат SongsOfSyx.jar и base) или её zip-архив. Повторный импорт заменит файлы игры, сохранения останутся.</string>
-    <string name="syx_import_folder">Выбрать папку игры</string>
-    <string name="syx_import_zip">Выбрать zip-архив</string>
     <string name="syx_importing">Импорт игры…</string>
     <string name="syx_import_copying">Копирование файлов игры…</string>
     <string name="syx_import_checking">Проверка файлов игры…</string>

@@ -4,7 +4,6 @@
     <string name="percentage_format" translatable="false">%d%%</string>
 
     <string name="legal_notice_title">法律声明</string>
-    <string name="legal_notice_message">此启动器是一个第三方工具，需要原版《Project Zomboid》文件才能运行。您必须拥有合法授权的游戏副本才能使用本软件。本启动器的开发者与原游戏创作者无任何关联，且不对因使用本软件而产生的任何法律后果承担责任。</string>
 
     <string name="fragment_label_launcher">启动器</string>
     <string name="fragment_label_new_game_instance">新建游戏实例</string>
@@ -89,13 +88,11 @@
     <string name="game_instance_manage_storage">管理存储</string>
     <string name="game_instance_delete">删除</string>
 
-    <string name="donate_message">喜欢这个应用并想支持我们吗？\n\n现由 ko-fi.com/udarmolota 维护和开发，\n由 ko-fi.com/liamelui 创建。\n\n其他贡献者：\nshimux0, Wakort, LeHiepDuy, deadgamer182, Liko, Willing-Run-8987, Willing-Upstairs-580。</string>
 
     <string name="app_aborted">应用遇到意外问题，必须关闭。</string>
     <string name="share_logs">分享日志文件</string>
 
     <string name="delete_game_instance">与此实例关联的所有游戏文件和数据（存档、模组、收藏的服务器等）将永久丢失。</string>
-    <string name="game_files_missing">确保 ProjectZomboid64 位于用于安装的 .zip 压缩包的根目录。您可以按照维基上的指南操作，确保文件打包正确。</string>
 
     <!-- Gamepad Mapper Strings -->
     <string name="gamepad_mapper_title">手柄按钮映射</string>
@@ -201,11 +198,6 @@
 
     <!-- Custom Driver import/export -->
     <string name="install_driver_menu">导入/导出自定义驱动</string>
-    <string name="install_driver_so_label">自定义 Vulkan 驱动（.so 文件）</string>
-    <string name="install_driver_warning">将替换之前加载的自定义驱动，风险自负。</string>
-    <string name="install_driver_import">导入</string>
-    <string name="install_driver_export">导出</string>
-    <string name="install_driver_wrong_extension">请选择 .so 文件</string>
 
     <!-- InstallerService task titles -->
     <string name="dialog_title_importing_driver">正在导入自定义驱动…</string>
@@ -217,14 +209,11 @@
 
     <string name="export_log_menu">导出游戏日志</string>
     <string name="export_log_export">导出 console.txt</string>
-    <string name="export_log_not_found">未找到日志文件。游戏可能尚未运行，或在创建 Zomboid 文件夹之前已崩溃。</string>
     <string name="dialog_title_exporting_log">正在导出日志…</string>
     <string name="dialog_title_log_exported">日志已导出</string>
     <string name="dialog_title_failed_to_export_log">日志导出失败</string>
 
     <string name="nav_menu_reddit">Reddit</string>
-    <string name="reddit_dialog_title">Zomdroid Reddit 社区</string>
-    <string name="reddit_message">加入我们的 Reddit 社区：\nhttps://www.reddit.com/r/zomdroid</string>
 
     <string name="settings_env_vars">环境变量</string>
     <string name="settings_env_vars_hint">例如：TU_DEBUG=nogmem</string>
@@ -246,7 +235,6 @@
     <string name="controls_editor_layout_restored">已恢复原始布局</string>
 
     <!-- Version update -->
-    <string name="version_check_title">Zomdroid by udar_molota</string>
     <string name="version_check_up_to_date">当前已是最新版本：%1$s</string>
     <string name="version_check_update_available">已安装：%1$s\n可用更新：%2$s\n%3$s</string>
     <string name="version_check_error">无法检查更新\n当前版本：%1$s</string>
@@ -305,9 +293,6 @@
     <string name="install_controls_group_file">按键布局文件</string>
     <string name="install_controls_group_export">导出按键布局</string>
     <string name="install_controls_export_hint">将当前按键布局保存为ZIP压缩包。</string>
-    <string name="install_driver_group_import">导入驱动</string>
-    <string name="install_driver_group_export">导出驱动</string>
-    <string name="install_driver_export_hint">将已安装的自定义驱动保存为.so文件。</string>
     <string name="export_log_group_export">导出日志</string>
     <string name="export_log_hint">从所选实例导出console.txt日志文件。</string>
 
@@ -339,15 +324,7 @@
     <string name="extracting">正在解压…</string>
 
     <!-- ===== CONTROLS EDITOR LAUNCH strings ===== -->
-    <string name="controls_editor_bg_group">背景图片（可选）</string>
-    <string name="controls_editor_bg_hint">从游戏中加载截图作为编辑器背景，方便将按钮放置在合适的位置。</string>
-    <string name="controls_editor_bg_clear">移除背景</string>
-    <string name="controls_editor_bg_saved">背景图片已保存</string>
-    <string name="controls_editor_bg_cleared">背景已移除</string>
     <string name="controls_editor_bg_error">保存背景失败：%1$s</string>
-    <string name="controls_editor_open_group">编辑器</string>
-    <string name="controls_editor_open_hint">打开控制编辑器，拖动、缩放并配置屏幕上的按钮。</string>
-    <string name="controls_editor_open_btn">打开编辑器</string>
 
     <!-- ===== ETO + collapsible strings ===== -->
 
@@ -407,9 +384,7 @@
     <string name="launcher_empty_body">要开始游戏，请先创建一个实例——也就是已安装的一份 Project Zomboid。用顶部的 + 添加游戏文件，或在侧边菜单中从 Steam 或 GOG 下载游戏。Steam 的下载需要先打包成 .zip；GOG 的下载完成后，点击“创建实例”即可。</string>
     <string name="launcher_empty_quick_start">快速开始</string>
     <string name="deephall_update_channel">新版本</string>
-    <string name="deephall_update_title">Deephall %1$s 已发布</string>
     <string name="deephall_update_text">点按查看更新内容并下载。</string>
-    <string name="game_loading_update_available">Deephall %1$s 已发布。点按查看更新内容。</string>
     <string name="settings_game_textures_title">压缩</string>
     <string name="settings_game_textures_desc">“低”只占四分之一的内存，加载更快，但近看会更模糊。“超低”再压缩一半，适合仍然内存不足的手机。默认情况下，内存少于 6 GB 的手机使用“低”。下次启动时生效。</string>
     <string name="settings_game_textures_none">无</string>

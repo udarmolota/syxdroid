@@ -50,7 +50,6 @@ import com.udarmolota.syxdroid.GameActivity;
 import com.udarmolota.syxdroid.InstallerService;
 import com.udarmolota.syxdroid.LauncherPreferences;
 import com.udarmolota.syxdroid.R;
-import com.udarmolota.syxdroid.SaveTransferActivity;
 
 import com.udarmolota.syxdroid.databinding.FragmentLauncherBinding;
 import com.udarmolota.syxdroid.databinding.TaskProgressDialogBinding;
@@ -221,12 +220,6 @@ public class LauncherFragment extends Fragment {
                                         .openControlsEditor(gameInstance);
                             } else if (itemId == R.id.action_game_instance_gamepad_mapper) {
                                 Navigation.findNavController(v).navigate(R.id.action_open_gamepad_mapper);
-                            } else if (itemId == R.id.action_game_instance_export_saves) {
-                                startActivity(SaveTransferActivity.intent(requireContext(),
-                                        SaveTransferActivity.ACTION_EXPORT_SAVES));
-                            } else if (itemId == R.id.action_game_instance_import_saves) {
-                                startActivity(SaveTransferActivity.intent(requireContext(),
-                                        SaveTransferActivity.ACTION_IMPORT_SAVES));
                             } else if (itemId == R.id.action_game_instance_manage_storage) {
                                 Uri folderUri = DocumentsContract.buildDocumentUri(C.STORAGE_PROVIDER_AUTHORITY, gameInstance.getHomePath());
                                 Intent intent = new Intent();

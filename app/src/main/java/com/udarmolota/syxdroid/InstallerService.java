@@ -98,7 +98,7 @@ public class InstallerService extends Service implements TaskProgressListener {
     private static volatile boolean taskRunning;
     public static boolean isTaskRunning() { return taskRunning; }
     private volatile int lastStartId;
-    // Who asked for the current PREPARE_BUNDLED_GAME run (see SyxStartActivity). The task
+    // Who asked for the current PREPARE_BUNDLED_GAME run (the removed Deephall start screen). The task
     // state outlives a task, so a screen binding in sees whatever the last task left behind; the
     // token is how it tells its own run from an earlier one.
     private volatile long currentRunToken;
