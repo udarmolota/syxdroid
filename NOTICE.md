@@ -28,7 +28,9 @@ SyxDroid ships **no part of Songs of Syx**. This repository and the built applic
 The user supplies the game themselves, from a copy they legally own (Steam, Windows or Linux
 depot). On first start SyxDroid copies two parts of that copy, `SongsOfSyx.jar` and `base/`, from
 a folder or zip the user picks into the app's private storage on the same device. It never uploads
-or redistributes them. The launcher's icon, logo and banner are original artwork, not the game's.
+or redistributes them. The optional in-app Steam download signs in to Steam with the login the
+user types; it goes only to Steam, for that sign-in, and is not stored. The downloaded game is
+saved as a zip in the user's own Download/SyxDroid folder. The launcher's icon, logo and banner are original artwork, not the game's.
 
 ## 3. What SyxDroid changes when it runs the user's copy
 
@@ -90,7 +92,16 @@ These components are loaded dynamically and are not linked into SyxDroid's own c
 | Gson | 2.10.1 | Apache-2.0 | <https://github.com/google/gson> |
 | Apache Commons IO | 2.18.0 | Apache-2.0 | <https://commons.apache.org/proper/commons-io/> |
 | Apache Commons Compress | 1.27.1 | Apache-2.0 | <https://commons.apache.org/proper/commons-compress/> |
-| XZ for Java | 1.10 | public domain (0BSD) | <https://tukaani.org/xz/java.html> |
+| XZ for Java | 1.11 | 0BSD | <https://tukaani.org/xz/java.html> |
+| JavaSteam and its DepotDownloader (in-app Steam download) | 1.8.0 | MIT | <https://github.com/Longi94/JavaSteam> |
+| Bouncy Castle (bcprov-jdk18on) | 1.83 | Bouncy Castle Licence (MIT-style) | <https://www.bouncycastle.org/> |
+| Protocol Buffers (Java) | 4.31.1 | BSD-3-Clause | <https://github.com/protocolbuffers/protobuf> |
+| zstd-jni (with the zstd library inside) | 1.5.7-6 | BSD-2-Clause (zstd: BSD-3-Clause) | <https://github.com/luben/zstd-jni> |
+| Ktor client | 3.3.3 | Apache-2.0 | <https://github.com/ktorio/ktor> |
+| OkHttp, Okio | 5.3.2, 3.16.4 | Apache-2.0 | <https://github.com/square/okhttp>, <https://github.com/square/okio> |
+| Kotlin standard library, kotlinx.coroutines, kotlinx.serialization, kotlinx-io, JetBrains annotations | 2.2.21, 1.10.2, 1.9.0, 0.8.0, 23.0.0 | Apache-2.0 | <https://github.com/JetBrains/kotlin>, <https://github.com/Kotlin> |
+| Apache Commons Codec, Commons Lang | 1.17.1, 3.20.0 | Apache-2.0 | <https://commons.apache.org/> |
+| SLF4J API | 2.0.17 | MIT | <https://www.slf4j.org/> |
 | AndroidX, Material Components | see `gradle/libs.versions.toml` | Apache-2.0 | <https://developer.android.com/jetpack/androidx> |
 | Android NDK runtime, `libc++_shared.so` | NDK r27 | Apache-2.0 with LLVM Exception | <https://llvm.org/> |
 
