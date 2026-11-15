@@ -536,4 +536,22 @@
     <string name="syx_fps_limit">Ограничение частоты кадров (со следующего запуска)</string>
     <string name="syx_fps_value">%1$d FPS</string>
     <string name="syx_fps_value_default">%1$d FPS (по умолчанию)</string>
+    <!-- Strings that had no Russian version yet -->
+    <string name="fragment_label_instance_settings">Настройки экземпляра</string>
+    <string name="game_instance_settings">Настройки экземпляра</string>
+    <string name="app_settings_instance_hint">Рендерер, драйвер, аргументы Java, разрешение и экранное управление относятся к экземпляру игры. Откройте их шестерёнкой на карточке экземпляра.</string>
+    <string name="release_notes_title">Что нового в %1$s</string>
+    <string name="bug_report_pick_instance">К какой игре относится этот отчёт?</string>
+    <string name="nav_bottom_github">GitHub</string>
+    <string name="settings_etc2_cache_label">Кэш текстур: %1$s</string>
+    <string name="settings_etc2_cache_cleared">Кэш текстур очищен</string>
+    <string name="preset_current">Сейчас применён: %1$s</string>
+    <string name="preset_current_none">Сейчас применены: ваши собственные настройки</string>
+    <string name="preset_button_apply_suggested">Рекомендуемый пресет</string>
+    <string name="renderer_gl4es_build41_title">GL4ES — для Build 41</string>
+    <string name="renderer_gl4es_build41_message">Для Build 41 это правильный выбор: работает на любом GPU и не требует настройки драйвера.\n\nНа Build 42 он не работает — будет чёрный экран. Там используйте NG_GL4ES (любой GPU) или ZINK (Adreno).</string>
+    <string name="preset_dialog_gpu_zink">Обнаружен %1$s. Установлены рендерер ZINK_ZFA и подходящий вашему GPU драйвер Vulkan. Если картинка выглядит неправильно, попробуйте другой драйвер или импортируйте свой в настройках.</string>
+    <string name="preset_dialog_gpu_zink_unnamed">Установлены рендерер ZINK_ZFA и драйвер Vulkan. Если картинка выглядит неправильно, попробуйте другой драйвер или импортируйте свой в настройках.</string>
+    <string name="preset_dialog_troubleshoot">Если игра не запускается с этими настройками или вскоре закрывается, попробуйте готовый пресет — кнопка ниже.</string>
+    <string name="preset_dialog_b41_applied">Установлен рендерер GL4ES — он работает на любом GPU и не требует настройки драйвера.</string>
 </resources>
