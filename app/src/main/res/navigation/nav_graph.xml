@@ -35,6 +35,32 @@
     <action
         android:id="@+id/action_open_controls_editor_launch"
         app:destination="@id/controls_editor_launch_fragment" />
+    <action
+        android:id="@+id/action_open_bug_report"
+        app:destination="@id/bug_report_fragment" />
+    <action
+        android:id="@+id/action_open_transfer"
+        app:destination="@id/transfer_fragment" />
+
+    <!-- The bottom bar's pages (as in RimDroid): the bar's item ids are these destination ids. -->
+    <fragment
+        android:id="@+id/transfer_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.TransferFragment"
+        android:label="@string/transfer_title"
+        tools:layout="@layout/fragment_transfer" />
+
+    <fragment
+        android:id="@+id/projects_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.ProjectsFragment"
+        android:label="@string/projects_title"
+        tools:layout="@layout/fragment_projects" />
+
+    <!-- Report a bug: one screen, by email or saved to a file (as in RimDroid) -->
+    <fragment
+        android:id="@+id/bug_report_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.BugReportFragment"
+        android:label="@string/bug_report_title"
+        tools:layout="@layout/fragment_bug_report" />
 
     <fragment
         android:id="@+id/launcher_fragment"

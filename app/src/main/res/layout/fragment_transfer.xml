@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Import / export (TransferFragment, as in RimDroid): a card each for the saves, the game's
+     settings and the on-screen controls. SyxDroid has one game, so there is no instance picker. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp">
+
+        <!-- Saves -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/AppTheme.TransferCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/AppTheme.TransferCardTitle"
+                    android:text="@string/transfer_saves" />
+
+                <TextView
+                    style="@style/AppTheme.TransferCardHint"
+                    android:text="@string/syx_transfer_saves_hint" />
+
+                <LinearLayout style="@style/AppTheme.TransferButtonRow">
+
+                    <Button
+                        android:id="@+id/btn_transfer_saves_import"
+                        style="@style/AppTheme.TransferButton"
+                        android:text="@string/transfer_import" />
+
+                    <Button
+                        android:id="@+id/btn_transfer_saves_export"
+                        style="@style/AppTheme.TransferButton.Outlined"
+                        android:text="@string/transfer_export" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Game settings -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/AppTheme.TransferCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/AppTheme.TransferCardTitle"
+                    android:text="@string/transfer_settings" />
+
+                <TextView
+                    style="@style/AppTheme.TransferCardHint"
+                    android:text="@string/syx_transfer_settings_hint" />
+
+                <LinearLayout style="@style/AppTheme.TransferButtonRow">
+
+                    <Button
+                        android:id="@+id/btn_transfer_settings_import"
+                        style="@style/AppTheme.TransferButton"
+                        android:text="@string/transfer_import" />
+
+                    <Button
+                        android:id="@+id/btn_transfer_settings_export"
+                        style="@style/AppTheme.TransferButton.Outlined"
+                        android:text="@string/transfer_export" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Controls -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/AppTheme.TransferCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/AppTheme.TransferCardTitle"
+                    android:text="@string/transfer_controls" />
+
+                <TextView
+                    style="@style/AppTheme.TransferCardHint"
+                    android:text="@string/syx_transfer_controls_hint" />
+
+                <LinearLayout style="@style/AppTheme.TransferButtonRow">
+
+                    <Button
+                        android:id="@+id/btn_transfer_controls_import"
+                        style="@style/AppTheme.TransferButton"
+                        android:text="@string/transfer_import" />
+
+                    <Button
+                        android:id="@+id/btn_transfer_controls_export"
+                        style="@style/AppTheme.TransferButton.Outlined"
+                        android:text="@string/transfer_export" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

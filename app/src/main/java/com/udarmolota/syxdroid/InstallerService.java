@@ -742,11 +742,12 @@ public class InstallerService extends Service implements TaskProgressListener {
         // Persistent mirror of native stdout/stderr (box64 SEGV/BT reports, NG probes) —
         // survives crashes/restarts, unlike the rotating logcat.
         File nativeLog = gi == null ? null : new File(gi.getGamePath() + "/native.log");
-        // The game's own log (Deephall writes it into its working dir, the game dir): Java
-        // exceptions land here and nowhere else. log.0.txt is the run before, as the game rotates
-        // the file at start, so a crash followed by one more launch is still in the report.
-        File gameLog = gi == null ? null : new File(gi.getGamePath() + "/log.txt");
-        File previousGameLog = gi == null ? null : new File(gi.getGamePath() + "/log.0.txt");
+        // Songs of Syx prints its log to stdout, so it is in native.log above. What it keeps in
+        // its user folder: its own settings (screen mode, scale, mod list) as the launcher left them.
+        File gameSettings = gi == null ? null
+                : new File(gi.getHomePath() + "/.local/share/songsofsyx/settings/LauncherSettings.txt");
+        // MobileGlues' own log: its config, the GLES version and extensions it found.
+        File mobileGluesLog = new File(AppStorage.requireSingleton().getHomePath() + "/mobileglues/latest.log");
         // NG_GL4ES shader diagnostics: full source + driver log of shaders that failed to
         // compile/link (up to 10 programs) + GL trace. Written by libng_gl4es into files/.
         File failedShaders = new File(AppStorage.requireSingleton().getHomePath() + "/failed_shaders.txt");
@@ -768,13 +769,13 @@ public class InstallerService extends Service implements TaskProgressListener {
                     : "system default";
 
             zos.putNextEntry(new ZipEntry("report.txt"));
-            writeLogUtf8(zos, "=== Deephall Bug Report ===\n");
+            writeLogUtf8(zos, "=== SyxDroid Bug Report ===\n");
             writeLogUtf8(zos, "Device   : " + Build.MANUFACTURER + " " + Build.MODEL + "\n");
             writeLogUtf8(zos, "Android  : " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")\n");
             // The git id is what actually identifies the build: versionName/versionCode repeat
             // across test builds (1.4.7 and 1.4.7v4 both reported as "1.4.7 (147)"), so without it
             // a report cannot say which binary produced it. "+" means the tree had uncommitted work.
-            writeLogUtf8(zos, "Deephall : " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE
+            writeLogUtf8(zos, "SyxDroid : " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE
                     + ", " + BuildConfig.GIT_BUILD_ID + ")\n");
             // Which instance this report is even about: the instance and its preset.
             writeLogUtf8(zos, gi == null
@@ -805,8 +806,8 @@ public class InstallerService extends Service implements TaskProgressListener {
             // Original log files, verbatim — each kept whole in its own entry
             addFileToZip(zos, crashFile, "crash.txt");
             addFileToZip(zos, nativeLog, "native.log");
-            addFileToZip(zos, gameLog, "game-log.txt");
-            addFileToZip(zos, previousGameLog, "game-log.0.txt");
+            addFileToZip(zos, gameSettings, "LauncherSettings.txt");
+            addFileToZip(zos, mobileGluesLog, "mobileglues.log");
             addFileToZip(zos, failedShaders, "failed_shaders.txt");
             addFileToZip(zos, glTrace, "gl_trace.txt");
             addFileToZip(zos, launcherLog, "log.txt");

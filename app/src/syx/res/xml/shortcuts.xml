@@ -31,10 +31,11 @@
         android:icon="@drawable/shortcut_saves"
         android:shortcutShortLabel="@string/shortcut_saves_short"
         android:shortcutLongLabel="@string/shortcut_saves_long">
+        <!-- The launcher's Import / export page: saves, game settings, controls -->
         <intent
-            android:action="com.udarmolota.syxdroid.action.SAVES"
+            android:action="com.udarmolota.syxdroid.action.OPEN_TRANSFER"
             android:targetPackage="com.udarmolota.syxdroid"
-            android:targetClass="com.udarmolota.syxdroid.SaveTransferActivity" />
+            android:targetClass="com.udarmolota.syxdroid.LauncherActivity" />
     </shortcut>
     <shortcut
         android:shortcutId="bug_report"

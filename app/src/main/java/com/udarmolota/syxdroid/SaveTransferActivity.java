@@ -113,11 +113,11 @@ public class SaveTransferActivity extends ComponentActivity {
         importLauncher.launch(new String[]{"*/*"});
     }
 
-    /** The bundled instance's saves folder: user.home is the instance home, the game adds the rest. */
+    /** Songs of Syx's saves folder: user.home is the instance home, the game adds the rest. */
     private static File savesDir() {
         GameInstance instance = GameInstanceManager.requireSingleton().getInstanceByName(SyxGame.INSTANCE_NAME);
         if (instance == null) return null;
-        return new File(instance.getHomePath(), "Mountaincore/saves");
+        return new File(instance.getHomePath(), ".local/share/songsofsyx/saves/saves");
     }
 
     private static File[] listSaves(File savesDir) {

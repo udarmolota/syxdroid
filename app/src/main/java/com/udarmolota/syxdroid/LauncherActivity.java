@@ -53,6 +53,9 @@ public class LauncherActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
     private boolean inited = false;
+    /** The bottom bar's pages (menu_bottom_nav.xml): top level, and the only screens showing the bar. */
+    private static final int[] BOTTOM_NAV_DESTINATIONS = {
+            R.id.launcher_fragment, R.id.transfer_fragment, R.id.projects_fragment};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +74,14 @@ public class LauncherActivity extends AppCompatActivity {
             @Override
             public WindowInsets onApplyWindowInsets(@NonNull View v, @NonNull WindowInsets windowInsets) {
                 Insets insets = windowInsets.getInsets(WindowInsets.Type.systemBars());
+                // With the bottom bar shown, the bar itself takes the navigation-bar inset
+                // (paddingBottomSystemWindowInsets), so its colour runs under the system buttons.
+                boolean barShown = binding.bottomNav.getVisibility() == View.VISIBLE;
                 v.setPadding(
                         v.getPaddingLeft(),
                         insets.top,
                         v.getPaddingRight(),
-                        //v.getPaddingBottom()
-                        insets.bottom
+                        barShown ? 0 : insets.bottom
                 );
 
                 return windowInsets;
@@ -96,8 +101,8 @@ public class LauncherActivity extends AppCompatActivity {
         // The launcher is SyxDroid's front door (the app icon opens it, like RimDroid), so the
         // drawer is open for business: the openable layout gives the hamburger on the home screen.
         // Deephall had it locked shut; its entries are still Zomdroid's and get redone later.
-        appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.launcher_fragment)
+        // The bottom bar's pages are all top level: the hamburger on each, no back arrow.
+        appBarConfiguration = new AppBarConfiguration.Builder(BOTTOM_NAV_DESTINATIONS)
                 .setOpenableLayout(binding.drawerLayout)
                 .build();
         binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -105,6 +110,16 @@ public class LauncherActivity extends AppCompatActivity {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.launcherNv, navController);
+        NavigationUI.setupWithNavController(binding.bottomNav, navController);
+        // The bottom bar only on its own pages (as in RimDroid): elsewhere it would eat height.
+        navController.addOnDestinationChangedListener((c, dest, args) -> {
+            boolean main = false;
+            for (int d : BOTTOM_NAV_DESTINATIONS) if (d == dest.getId()) main = true;
+            if ((binding.bottomNav.getVisibility() == View.VISIBLE) != main) {
+                binding.bottomNav.setVisibility(main ? View.VISIBLE : View.GONE);
+                binding.appbarLayout.requestApplyInsets();   // move the bottom inset to the bar or back
+            }
+        });
 
         binding.launcherNv.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.action_open_controls_editor) {
@@ -123,8 +138,9 @@ public class LauncherActivity extends AppCompatActivity {
                 navController.navigate(R.id.action_install_controls);
                 return true;
             } else if (item.getItemId() == R.id.action_bug_report) {
+                // One screen with both ways to send: by email or saved to a file (BugReportFragment)
                 binding.drawerLayout.close();
-                sendBugReport();
+                navController.navigate(R.id.action_open_bug_report);
                 return true;
         }
 
@@ -157,6 +173,7 @@ public class LauncherActivity extends AppCompatActivity {
     // icon's long-press menu (res/xml/shortcuts.xml in the debug source set).
     public static final String ACTION_OPEN_SETTINGS = "com.udarmolota.syxdroid.action.OPEN_SETTINGS";
     public static final String ACTION_SEND_BUG_REPORT = "com.udarmolota.syxdroid.action.SEND_BUG_REPORT";
+    public static final String ACTION_OPEN_TRANSFER = "com.udarmolota.syxdroid.action.OPEN_TRANSFER";
 
     private void handleShortcutAction(Intent intent) {
         String action = intent != null ? intent.getAction() : null;
@@ -180,7 +197,11 @@ public class LauncherActivity extends AppCompatActivity {
                 navController.navigate(R.id.action_open_instance_settings, args);
             });
         } else if (ACTION_SEND_BUG_REPORT.equals(action)) {
-            binding.getRoot().post(this::sendBugReport);
+            // The Report a bug screen: by email or saved to a file
+            binding.getRoot().post(() -> navController.navigate(R.id.action_open_bug_report));
+        } else if (ACTION_OPEN_TRANSFER.equals(action)) {
+            // Saves, settings and controls import / export
+            binding.getRoot().post(() -> navController.navigate(R.id.action_open_transfer));
         }
     }
 

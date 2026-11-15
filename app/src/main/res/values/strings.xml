@@ -304,7 +304,7 @@
     <string name="nav_bug_report">Report a bug</string>
     <string name="bug_report_preparing">Preparing bug report…</string>
     <string name="bug_report_email" translatable="false">210478@mail.ru</string>
-    <string name="bug_report_subject" translatable="false">DEEPHALL REPORT %1$s</string>
+    <string name="bug_report_subject" translatable="false">SYXDROID REPORT %1$s</string>
     <string name="bug_report_body">Hi, I have a new bug report.\n\nDescription: \n\n\n---\n%1$s</string>
     <string name="bug_report_no_mail">No email app found on this device.</string>
 
@@ -518,4 +518,51 @@
     <string name="syx_render_res_label">Render resolution</string>
     <string name="syx_render_res_item">%1$s (full screen)</string>
     <string name="syx_render_res_hint">Lower = more FPS and a bigger UI. Native = sharpest. The lowest choice is the game\'s own minimum, 1280×768. Applies at the next start.</string>
+    <!-- Launcher pages taken from RimDroid: bottom bar, import / export, projects, bug report -->
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_transfer">Import</string>
+    <string name="bottom_nav_projects">Projects</string>
+    <string name="transfer_title">Import / export</string>
+    <string name="transfer_import">Import</string>
+    <string name="transfer_export">Export</string>
+    <string name="transfer_saves">Saves</string>
+    <string name="transfer_settings">Game settings</string>
+    <string name="transfer_controls">On-screen controls</string>
+    <string name="transfer_exported">Exported %1$s (%2$d KB)</string>
+    <string name="transfer_export_failed">Export failed: %1$s</string>
+    <string name="transfer_import_failed">Import failed: %1$s</string>
+    <string name="controls_import_failed">Could not import the layout: %1$s</string>
+    <string name="controls_exported">Controls layout exported</string>
+    <string name="syx_transfer_saves_hint">A zip of your saves, campaigns and profile: to keep, or to move to another phone. Saves with the same names are replaced on import.</string>
+    <string name="syx_transfer_settings_hint">The game\'s own settings: options, language and the mod list. Import replaces the current ones.</string>
+    <string name="syx_transfer_controls_hint">The on-screen controls layout as a .json, to keep or to share.</string>
+    <string name="syx_transfer_no_game">Import Songs of Syx first: there is nothing to import into or export yet.</string>
+    <string name="syx_transfer_saves_import_confirm">Import %1$s into your saves? Saves with the same names are replaced.</string>
+    <string name="syx_transfer_settings_import_confirm">Import %1$s as the game\'s settings? The current settings, mod list included, are replaced.</string>
+    <string name="syx_transfer_controls_import_confirm">Replace the on-screen controls with %1$s?</string>
+    <string name="syx_transfer_imported">Restored %1$s</string>
+    <string name="syx_transfer_controls_imported">Controls layout imported. It applies at the next game start.</string>
+    <string name="projects_title">Other projects</string>
+    <string name="projects_reddit_title" translatable="false">r/UdarMolotaDev</string>
+    <string name="projects_reddit_hint">News of all my projects</string>
+    <string name="projects_download">Download</string>
+    <string name="projects_page">Page</string>
+    <string name="projects_latest_version">Latest version: %1$s</string>
+    <string name="projects_here">You are here</string>
+    <string name="bug_report_title">Report a bug</string>
+    <string name="bug_report_intro">Something went wrong? Send us a report. It carries the game\'s logs, so we can see what happened.</string>
+    <string name="bug_report_group_instance">Game</string>
+    <string name="bug_report_group_email">Send by email</string>
+    <string name="bug_report_steps">1. Tap Send by email.\n2. In the list that opens, pick your mail app (Gmail, Outlook…).\n3. Write a few words about what happened and send.</string>
+    <string name="bug_report_send_email">Send by email</string>
+    <string name="bug_report_pick_mail">Send with</string>
+    <string name="bug_report_no_email_title">No email app on this device?</string>
+    <string name="bug_report_no_email_text">Save the report to a file, then send it from any device to this address. Attach the file and write a few words about what happened.</string>
+    <string name="bug_report_copy">Copy</string>
+    <string name="bug_report_copied">Address copied</string>
+    <string name="bug_report_save_file">Save report to a file</string>
+    <string name="bug_report_saved">Report saved</string>
+    <string name="bug_report_save_failed">Could not save the report: %1$s</string>
+    <string name="bug_report_no_mail_use_file">No email app found on this device. Save the report to a file and send it from another device.</string>
+    <string name="no_instances">Songs of Syx is not imported yet</string>
 </resources>

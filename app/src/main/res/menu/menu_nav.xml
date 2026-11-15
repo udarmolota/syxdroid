@@ -13,8 +13,11 @@
             android:title="@string/nav_menu_controls_editor"
             android:icon="@drawable/ic_controls"
             app:showAsAction="never"/>
+        <!-- Hidden: Songs of Syx has no gamepad support of its own (no joystick code at all), so
+             mapping gamepad buttons leads nowhere. The id stays: the nav graph's action uses it. -->
         <item
             android:id="@+id/action_open_gamepad_mapper"
+            android:visible="false"
             android:title="@string/nav_menu_gamepad_mapper"
             android:icon="@drawable/mt_icon_controller"
             app:showAsAction="never"/>
@@ -31,11 +34,7 @@
             android:title="@string/install_driver_menu"
             android:icon="@drawable/mt_icon_driver"
             app:showAsAction="never"/>
-        <item
-            android:id="@+id/action_export_log"
-            android:title="@string/export_log_menu"
-            android:icon="@drawable/ic_log_file"
-            app:showAsAction="never"/>
+        <!-- "Export log" is part of Report a bug now: one screen, by email or saved to a file -->
         <item
             android:id="@+id/action_bug_report"
             android:title="@string/nav_bug_report"
