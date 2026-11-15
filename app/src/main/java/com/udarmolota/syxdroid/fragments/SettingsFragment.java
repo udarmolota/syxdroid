@@ -82,6 +82,43 @@ public class SettingsFragment extends Fragment {
         });
     }
 
+    /**
+     * Frame rate limit: 30 / 60 / 90 / 120, only those the screen can show. Applies at the next start
+     * (GameLauncher passes it to GLFW, GameActivity to the surface).
+     */
+    private void setUpFpsLimit() {
+        float maxHz = 60f;
+        android.view.Display display = requireActivity().getDisplay();
+        if (display != null) {
+            for (android.view.Display.Mode m : display.getSupportedModes())
+                maxHz = Math.max(maxHz, m.getRefreshRate());
+        }
+        java.util.List<Integer> values = new java.util.ArrayList<>();
+        java.util.List<String> labels = new java.util.ArrayList<>();
+        for (int fps : com.udarmolota.syxdroid.game.InstanceSettings.FPS_LIMITS) {
+            if (fps > maxHz + 1f) continue;
+            values.add(fps);
+            labels.add(getString(fps == com.udarmolota.syxdroid.game.InstanceSettings.DEFAULT_FPS_LIMIT
+                    ? R.string.syx_fps_value_default : R.string.syx_fps_value, fps));
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.spinner_item, labels);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        android.widget.Spinner spinner = binding.settingsFpsLimitS;
+        spinner.setAdapter(adapter);
+        int current = values.indexOf(settings.getFpsLimit());
+        if (current < 0) current = values.indexOf(com.udarmolota.syxdroid.game.InstanceSettings.DEFAULT_FPS_LIMIT);
+        spinner.setSelection(Math.max(0, current), false);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                settings.setFpsLimit(values.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
     /** Off in SyxDroid: Songs of Syx runs on MobileGlues only. */
     private static final boolean SHOW_RENDERER_CHOICE = false;
 
@@ -309,6 +346,7 @@ public class SettingsFragment extends Fragment {
 
         setUpRenderResolution();
         setUpGameLanguage();
+        setUpFpsLimit();
 
         // In-game display: nothing / the plain FPS counter / the performance bar. Its own card, so
         // the three choices and what they mean are read together. Takes effect at the next launch.

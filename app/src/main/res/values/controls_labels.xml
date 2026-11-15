@@ -18,6 +18,11 @@
     <string name="ctl_style_outline">Outline</string>
     <string name="ctl_style_filled">Filled</string>
     <string name="ctl_style_glass">Glass</string>
+    <string name="ctl_label_gold">Light gold</string>
+    <string name="ctl_label_white">White</string>
+    <string name="ctl_label_grey">Light grey</string>
+    <string name="ctl_label_blue">Light blue</string>
+    <string name="ctl_label_orange">Orange</string>
     <string name="ctl_key_space">Space</string>
     <string name="ctl_key_left">Left %1$s</string>
     <string name="ctl_key_right">Right %1$s</string>

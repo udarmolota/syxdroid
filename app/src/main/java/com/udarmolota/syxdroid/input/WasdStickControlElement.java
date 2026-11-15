@@ -235,13 +235,13 @@ public class WasdStickControlElement extends AbstractControlElement {
 
         void setColor(int c) {
             color = c;
-            fillPaint.setColor(c);
+            fillPaint.setColor(android.graphics.Color.BLACK);   // Dark fill like the buttons' plate (~35 %), not the stick colour: white looked washed out on the map
             strokePaint.setColor(c);
         }
 
         void setAlpha(int a) {
             alpha = a;
-            fillPaint.setAlpha(a / 3);
+            fillPaint.setAlpha(Math.min(StickControlElement.STICK_FILL_ALPHA, a));
             strokePaint.setAlpha(a);
         }
 

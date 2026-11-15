@@ -90,6 +90,28 @@ public final class ControlLabels {
         }
     }
 
+    /** Label colours the editor offers; 0 is the default light gold (see ControlElementDescription). */
+    public static final Integer[] LABEL_COLORS = {0, 0xFFFFFFFF, 0xFFCCCCCC, 0xFF4FC3F7, 0xFFFFA726};
+
+    /** The presets, plus the element's own colour at the end if a layout file set another one. */
+    public static Integer[] labelColorsWith(int current) {
+        for (Integer c : LABEL_COLORS) if (c == current) return LABEL_COLORS;
+        Integer[] all = java.util.Arrays.copyOf(LABEL_COLORS, LABEL_COLORS.length + 1);
+        all[LABEL_COLORS.length] = current;
+        return all;
+    }
+
+    public static String labelColor(Context c, int color) {
+        switch (color) {
+            case 0: return c.getString(R.string.ctl_label_gold);
+            case 0xFFFFFFFF: return c.getString(R.string.ctl_label_white);
+            case 0xFFCCCCCC: return c.getString(R.string.ctl_label_grey);
+            case 0xFF4FC3F7: return c.getString(R.string.ctl_label_blue);
+            case 0xFFFFA726: return c.getString(R.string.ctl_label_orange);
+            default: return String.format(Locale.ROOT, "#%06X", color & 0xFFFFFF);
+        }
+    }
+
     public static String binding(Context c, GLFWBinding b) {
         switch (b) {
             case KEY_SPACE: return c.getString(R.string.ctl_key_space);

@@ -96,6 +96,7 @@
     <string name="control_element_stick_binding">Stick Binding</string>
     <string name="control_element_icon">Icon</string>
     <string name="control_element_style">Style</string>
+    <string name="control_element_label_color">Label colour</string>
     <string name="control_element_custom_icon">Custom icon…</string>
     <string name="control_element_icon_no_tint">Keep original colors</string>
     <string name="control_element_custom_icon_select_button">Select a button first</string>
@@ -567,6 +568,8 @@
     <string name="no_instances">Songs of Syx is not imported yet</string>
     <!-- The Game page: download the player's own Songs of Syx from Steam (SteamGameDownloader) -->
     <string name="bottom_nav_game">Game</string>
+    <string name="bottom_nav_controls">Controls</string>
+    <string name="controls_editor_pick_instance">Which instance?</string>
     <string name="steam_title">Download from Steam</string>
     <string name="steam_intro">Download your own copy of Songs of Syx straight from Steam to this phone, with no PC. You need a Steam account that owns the game. The game is saved as a zip in Download/SyxDroid (about 330 MB; about 500 MB of free space is needed while it downloads). Then create an instance from it, here or later with +.</string>
     <string name="steam_username">Steam login</string>
@@ -605,4 +608,7 @@
     <string name="steam_create_instance">Create new instance</string>
     <string name="syx_game_language">Game language</string>
     <string name="syx_game_language_auto">Automatic (phone language)</string>
+    <string name="syx_fps_limit">Frame rate limit (applies at the next start)</string>
+    <string name="syx_fps_value">%1$d FPS</string>
+    <string name="syx_fps_value_default">%1$d FPS (default)</string>
 </resources>

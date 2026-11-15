@@ -29,6 +29,10 @@ import java.lang.instrument.Instrumentation;
  *       desktop it opens a hidden 300x300 window to read the GPU name for an error message, then
  *       calls glfwTerminate, and our Android GLFW allows exactly one window per process, so the
  *       game's real window would then fail ("window is null").</li>
+ *   <li>{@code -Dsyx.agent.sleep=false}: keep the game's own frame wait. Otherwise
+ *       {@code snake2d.Sleeper.sync(fps)} waits for the next frame in SyxHooks.sync, which sleeps
+ *       the whole wait: the game's version spins in {@code Thread.yield()} for the last part of
+ *       every frame, a busy core that only heats the phone.</li>
  *   <li>{@code -Dsyx.agent.dumpShaders=<dir>}: write each shader before and after the rewrite
  *       into that folder, for debugging.</li>
  * </ul>
@@ -44,6 +48,7 @@ public final class SyxAgent {
     static boolean noSpawn;
     static boolean noBundledNatives;
     static boolean noProbeWindow;
+    static boolean sleep;
     static String dumpShadersDir;
 
     private SyxAgent() {}
@@ -54,10 +59,11 @@ public final class SyxAgent {
         noSpawn = flag("syx.agent.noSpawn");
         noBundledNatives = flag("syx.agent.noBundledNatives");
         noProbeWindow = flag("syx.agent.noProbeWindow");
+        sleep = flag("syx.agent.sleep");
         dumpShadersDir = System.getProperty("syx.agent.dumpShaders");
         System.out.println(TAG + "loaded: shaders=" + shaders + " rectTextures=" + rectTextures
                 + " noSpawn=" + noSpawn + " noBundledNatives=" + noBundledNatives
-                + " noProbeWindow=" + noProbeWindow + (dumpShadersDir != null ? " dumpShaders=" + dumpShadersDir : ""));
+                + " noProbeWindow=" + noProbeWindow + " sleep=" + sleep + (dumpShadersDir != null ? " dumpShaders=" + dumpShadersDir : ""));
         inst.addTransformer(new SyxTransformer());
     }
 

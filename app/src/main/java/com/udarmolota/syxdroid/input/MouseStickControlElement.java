@@ -247,8 +247,8 @@ public class MouseStickControlElement extends AbstractControlElement {
             resetInner();
         }
 
-        void setColor(int c)  { color = c; fillPaint.setColor(c); strokePaint.setColor(c); }
-        void setAlpha(int a)  { alpha = a; fillPaint.setAlpha(a / 3); strokePaint.setAlpha(a); }
+        void setColor(int c)  { color = c; fillPaint.setColor(android.graphics.Color.BLACK); strokePaint.setColor(c); }   // Dark fill like the buttons' plate (~35 %), not the stick colour: white looked washed out on the map
+        void setAlpha(int a)  { alpha = a; fillPaint.setAlpha(Math.min(StickControlElement.STICK_FILL_ALPHA, a)); strokePaint.setAlpha(a); }
         void setColorFilter(@Nullable ColorFilter cf) { fillPaint.setColorFilter(cf); strokePaint.setColorFilter(cf); }
 
         void setScale(float s) {
@@ -306,6 +306,19 @@ public class MouseStickControlElement extends AbstractControlElement {
         }
 
         void draw(Canvas canvas) {
+            // The same contour ring as the WASD stick, so both sticks read alike on light ground
+            int savedColor = strokePaint.getColor();
+            int savedAlpha = strokePaint.getAlpha();
+            android.graphics.ColorFilter savedFilter = strokePaint.getColorFilter();
+            strokePaint.setColorFilter(null);
+            strokePaint.setColor(StickControlElement.STICK_OUTLINE_COLOR);
+            strokePaint.setAlpha(StickControlElement.STICK_OUTLINE_ALPHA);
+            strokePaint.setStrokeWidth(PAINT_STROKE_WIDTH * parentView.pixelScale);
+            canvas.drawCircle(outerCenterX, outerCenterY, outerRadius, strokePaint);
+            strokePaint.setColor(savedColor);
+            strokePaint.setAlpha(savedAlpha);
+            strokePaint.setColorFilter(savedFilter);
+
             strokePaint.setStrokeWidth(PAINT_STROKE_WIDTH * parentView.pixelScale);
             canvas.drawCircle(outerCenterX, outerCenterY, outerRadius, strokePaint);
             canvas.drawCircle(outerCenterX, outerCenterY, outerRadius, fillPaint);

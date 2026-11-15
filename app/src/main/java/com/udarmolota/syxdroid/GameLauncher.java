@@ -187,6 +187,9 @@ public class GameLauncher {
             jvmArgs.add("-Dorg.lwjgl.librarypath=" + homePath + "/" + C.deps.LIBS_LWJGL_341);
             jvmArgs.add("-Dorg.lwjgl.glfw.libname=" + AppStorage.requireSingleton().getLibraryPath() + "/libglfw.so");
             jvmArgs.add("-Dorg.lwjgl.system.allocator=system");
+            // Frame limit: Songs of Syx caps its frames at the refresh rate GLFW reports
+            // (zomdroid_monitor.c), so the instance's limit is passed as that rate.
+            Os.setenv("SYX_REFRESH_RATE", String.valueOf(settings.getFpsLimit()), true);
             // SyxAgent: rectangle samplers -> 2D for GLES, no child java processes (see
             // syxagent/). Each change can be switched off with -Dsyx.agent.*=false.
             jvmArgs.add("-javaagent:" + homePath + "/" + C.deps.RUNTIME + "/syxagent.jar");

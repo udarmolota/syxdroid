@@ -15,6 +15,11 @@
     <string name="ctl_style_outline">Контур</string>
     <string name="ctl_style_filled">Заливка</string>
     <string name="ctl_style_glass">Стекло</string>
+    <string name="ctl_label_gold">Светлое золото</string>
+    <string name="ctl_label_white">Белый</string>
+    <string name="ctl_label_grey">Светло-серый</string>
+    <string name="ctl_label_blue">Голубой</string>
+    <string name="ctl_label_orange">Оранжевый</string>
     <string name="ctl_key_space">Пробел</string>
     <string name="ctl_key_left">Левый %1$s</string>
     <string name="ctl_key_right">Правый %1$s</string>

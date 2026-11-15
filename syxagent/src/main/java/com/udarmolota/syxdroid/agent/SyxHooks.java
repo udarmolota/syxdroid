@@ -32,6 +32,29 @@ public final class SyxHooks {
                 + (mainClass != null ? mainClass.getName() : "?") + " (Proccesser." + method + ")");
     }
 
+    /** Deadline of the next frame for {@link #sync}, in System.nanoTime() units; 0 = none yet. */
+    private static long nextFrame;
+
+    /**
+     * Called by snake2d.Sleeper.sync(fps) once per frame: waits until the next frame is due,
+     * asleep the whole time. A frame that ran late is not waited for, and the schedule restarts
+     * from it, so a slow stretch does not end in a burst of catch-up frames.
+     */
+    public static void sync(int fps) {
+        if (fps <= 0) return;
+        long period = 1_000_000_000L / fps;
+        long now = System.nanoTime();
+        if (nextFrame == 0 || now - nextFrame > period) {
+            nextFrame = now + period;
+            return;
+        }
+        long left;
+        while ((left = nextFrame - System.nanoTime()) > 0) {
+            java.util.concurrent.locks.LockSupport.parkNanos(left);
+        }
+        nextFrame += period;
+    }
+
     private static void dump(String fileName, String before, String after) {
         String dir = SyxAgent.dumpShadersDir;
         if (dir == null || fileName == null) return;

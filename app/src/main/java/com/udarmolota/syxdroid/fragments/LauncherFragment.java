@@ -216,7 +216,9 @@ public class LauncherFragment extends Fragment {
                         public boolean onMenuItemClick(MenuItem item) {
                             int itemId = item.getItemId();
                             if (itemId == R.id.action_game_instance_controls_editor) {
-                                Navigation.findNavController(v).navigate(R.id.action_open_controls_editor_launch);
+                                // Straight into the editor for this card's instance
+                                ((com.udarmolota.syxdroid.LauncherActivity) requireActivity())
+                                        .openControlsEditor(gameInstance);
                             } else if (itemId == R.id.action_game_instance_gamepad_mapper) {
                                 Navigation.findNavController(v).navigate(R.id.action_open_gamepad_mapper);
                             } else if (itemId == R.id.action_game_instance_export_saves) {

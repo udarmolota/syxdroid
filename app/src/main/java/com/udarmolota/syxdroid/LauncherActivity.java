@@ -134,6 +134,14 @@ public class LauncherActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.launcherNv, navController);
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
+        // The Controls item is not a page: it opens the editor and leaves the current tab selected.
+        binding.bottomNav.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.action_bottom_controls_editor) {
+                openControlsEditor();
+                return false;
+            }
+            return NavigationUI.onNavDestinationSelected(item, navController);
+        });
         // The bottom bar only on its own pages (as in RimDroid): elsewhere it would eat height.
         navController.addOnDestinationChangedListener((c, dest, args) -> {
             boolean main = false;
@@ -150,10 +158,8 @@ public class LauncherActivity extends AppCompatActivity {
                 pickGameZip();
                 return true;
             } else if (item.getItemId() == R.id.action_open_controls_editor) {
-                //Intent intent = new Intent(this, ControlsEditorActivity.class);
-                //startActivity(intent);
                 binding.drawerLayout.close();
-                navController.navigate(R.id.action_open_controls_editor_launch);
+                openControlsEditor();
                 return true;
             } else if (item.getItemId() == R.id.action_open_gamepad_mapper) {
                 // Navigate to gamepad mapper using NavController
@@ -379,6 +385,40 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     // ---- Bug report -------------------------------------------------------------
+
+    /**
+     * Opens the controls editor straight away, as in RimDroid: one instance is taken as is, several
+     * are offered in a dialog. No intermediate screen.
+     */
+    public void openControlsEditor() {
+        java.util.List<GameInstance> instances =
+                new java.util.ArrayList<>(GameInstanceManager.requireSingleton().getInstances());
+        if (instances.isEmpty()) {
+            Toast.makeText(this, R.string.no_instances, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (instances.size() == 1) {
+            openControlsEditor(instances.get(0));
+            return;
+        }
+        String[] names = new String[instances.size()];
+        for (int i = 0; i < instances.size(); i++) names[i] = instances.get(i).getName();
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.controls_editor_pick_instance)
+                .setItems(names, (d, which) -> openControlsEditor(instances.get(which)))
+                .setNegativeButton(R.string.dialog_button_cancel, null)
+                .show();
+    }
+
+    /** Opens the editor for this instance, over the background picture saved earlier if there is one. */
+    public void openControlsEditor(GameInstance instance) {
+        Intent intent = new Intent(this, ControlsEditorActivity.class);
+        intent.putExtra(ControlsEditorActivity.EXTRA_INSTANCE_NAME, instance.getName());
+        File bg = new File(instance.getHomePath(),
+                "game/controls/" + com.udarmolota.syxdroid.fragments.ControlsEditorLaunchFragment.BACKGROUND_FILENAME);
+        if (bg.isFile()) intent.putExtra(ControlsEditorActivity.EXTRA_BACKGROUND_PATH, bg.getAbsolutePath());
+        startActivity(intent);
+    }
 
     /**
      * Open the user's email app pre-filled with a bug report — with the same log bundle that

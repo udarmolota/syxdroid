@@ -142,6 +142,23 @@ public class InstanceSettings {
         prefs.edit().putString(keyPrefix + "game_language", code).apply();
     }
 
+    /** The frame rates offered in the settings. */
+    public static final int[] FPS_LIMITS = {30, 60, 90, 120};
+    public static final int DEFAULT_FPS_LIMIT = 60;
+
+    /**
+     * Songs of Syx's frame limit. The game caps its frames at the monitor's refresh rate, so this is
+     * passed to GLFW as that rate (SYX_REFRESH_RATE) and to Android as the surface's frame rate.
+     * 60 by default: a strategy game gains little from 120 and the phone runs hotter.
+     */
+    public int getFpsLimit() {
+        return prefs.getInt(keyPrefix + "fps_limit", DEFAULT_FPS_LIMIT);
+    }
+
+    public void setFpsLimit(int fps) {
+        prefs.edit().putInt(keyPrefix + "fps_limit", fps).apply();
+    }
+
     /** Deephall's texture set: {@link GameTextures#AUTO} (by installed RAM), FULL or REDUCED. */
     public String getGameTextures() {
         return prefs.getString(keyPrefix + "game_textures", GameTextures.AUTO);

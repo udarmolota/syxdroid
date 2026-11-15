@@ -370,6 +370,7 @@
     <string name="settings_group_appearance">Оформление</string>
     <string name="settings_theme">Тема лаунчера</string>
     <string name="control_element_style">Стиль</string>
+    <string name="control_element_label_color">Цвет подписи</string>
     <string name="control_element_custom_icon">Своя иконка…</string>
     <string name="control_element_custom_icon_failed">Не удалось загрузить изображение</string>
     <string name="control_element_custom_icon_select_button">Сначала выберите кнопку</string>
@@ -518,6 +519,8 @@
     <string name="no_instances">Songs of Syx ещё не импортирована</string>
     <!-- Вкладка «Игра»: скачивание своей копии Songs of Syx из Steam -->
     <string name="bottom_nav_game">Игра</string>
+    <string name="bottom_nav_controls">Управление</string>
+    <string name="controls_editor_pick_instance">Какой экземпляр?</string>
     <string name="steam_title">Скачать из Steam</string>
     <string name="steam_intro">Скачайте свою копию Songs of Syx из Steam прямо на телефон, без ПК. Нужен аккаунт Steam, на котором есть игра. Игра сохраняется zip-архивом в Загрузки/SyxDroid (около 330 МБ; на время загрузки нужно около 500 МБ свободного места). Потом создайте из него экземпляр — здесь же или позже кнопкой +.</string>
     <string name="steam_username">Логин Steam</string>
@@ -556,4 +559,7 @@
     <string name="steam_create_instance">Создать новый экземпляр</string>
     <string name="syx_game_language">Язык игры</string>
     <string name="syx_game_language_auto">Автоматически (язык телефона)</string>
+    <string name="syx_fps_limit">Ограничение частоты кадров (со следующего запуска)</string>
+    <string name="syx_fps_value">%1$d FPS</string>
+    <string name="syx_fps_value_default">%1$d FPS (по умолчанию)</string>
 </resources>

@@ -266,9 +266,9 @@ public class ControlsEditorActivity extends AppCompatActivity {
                     case BUTTON_RECT: {
                         binding.elementToggleTextRowLl.setVisibility(View.VISIBLE);
                         binding.elementTextTv.setVisibility(View.VISIBLE);
-                        binding.elementTogglingTv.setVisibility(View.VISIBLE);
+                        binding.elementTogglingTv.setVisibility(View.GONE); // hidden in SyxDroid
                         binding.elementToggleTextFieldsLl.setVisibility(View.VISIBLE);
-                        binding.elementTogglingCb.setVisibility(View.VISIBLE);
+                        binding.elementTogglingCb.setVisibility(View.GONE); // hidden in SyxDroid
                         binding.elementTextEt.setVisibility(View.VISIBLE);
                         binding.elementTextEt.removeTextChangedListener(controlElementTextWatcher);
                         controlElementTextWatcher = new TextWatcher() {
@@ -336,9 +336,37 @@ public class ControlsEditorActivity extends AppCompatActivity {
                             });
                         });
 
+                        // Label colour (text and tinted icon) — only for buttons
+                        if (element instanceof com.udarmolota.syxdroid.input.ButtonControlElement) {
+                            com.udarmolota.syxdroid.input.ButtonControlElement button =
+                                    (com.udarmolota.syxdroid.input.ButtonControlElement) element;
+                            binding.elementLabelColorTv.setVisibility(View.VISIBLE);
+                            binding.elementLabelColorS.setVisibility(View.VISIBLE);
+                            ArrayAdapter<Integer> adapterLabel = new ControlLabels.Adapter<>(ControlsEditorActivity.this,
+                                    R.layout.spinner_item,
+                                    ControlLabels.labelColorsWith(button.getLabelColor()),
+                                    c -> ControlLabels.labelColor(ControlsEditorActivity.this, c));
+                            binding.elementLabelColorS.setAdapter(adapterLabel);
+                            binding.elementLabelColorS.setOnItemSelectedListener(null);
+                            binding.elementLabelColorS.setSelection(adapterLabel.getPosition(button.getLabelColor()));
+                            binding.elementLabelColorS.post(() -> {
+                                binding.elementLabelColorS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                    @Override
+                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                        button.setLabelColor((Integer) parent.getSelectedItem());
+                                    }
+                                    @Override
+                                    public void onNothingSelected(AdapterView<?> parent) {}
+                                });
+                            });
+                        } else {
+                            binding.elementLabelColorTv.setVisibility(View.GONE);
+                            binding.elementLabelColorS.setVisibility(View.GONE);
+                        }
+
                         // Custom image icon (load your own picture)
                         binding.elementCustomIconB.setVisibility(View.VISIBLE);
-                        binding.elementIconNoTintCb.setVisibility(View.VISIBLE);
+                        binding.elementIconNoTintCb.setVisibility(View.GONE); // hidden in SyxDroid
                         binding.elementIconNoTintCb.setOnCheckedChangeListener(null);
                         if (element instanceof com.udarmolota.syxdroid.input.ButtonControlElement) {
                             binding.elementIconNoTintCb.setChecked(
@@ -371,10 +399,12 @@ public class ControlsEditorActivity extends AppCompatActivity {
                         binding.elementIconS.setVisibility(View.GONE);
                         binding.elementStyleTv.setVisibility(View.GONE);
                         binding.elementStyleS.setVisibility(View.GONE);
+                        binding.elementLabelColorTv.setVisibility(View.GONE);
+                        binding.elementLabelColorS.setVisibility(View.GONE);
 
                         // Custom center image (same as round buttons).
                         binding.elementCustomIconB.setVisibility(View.VISIBLE);
-                        binding.elementIconNoTintCb.setVisibility(View.VISIBLE);
+                        binding.elementIconNoTintCb.setVisibility(View.GONE); // hidden in SyxDroid
                         binding.elementIconNoTintCb.setOnCheckedChangeListener(null);
                         if (element instanceof com.udarmolota.syxdroid.input.RadialMenuControlElement) {
                             binding.elementIconNoTintCb.setChecked(
@@ -416,11 +446,13 @@ public class ControlsEditorActivity extends AppCompatActivity {
                         binding.elementIconS.setVisibility(View.GONE);
                         binding.elementStyleTv.setVisibility(View.GONE);
                         binding.elementStyleS.setVisibility(View.GONE);
+                        binding.elementLabelColorTv.setVisibility(View.GONE);
+                        binding.elementLabelColorS.setVisibility(View.GONE);
 
                         // Custom image: replaces the drawn cross (composite DPAD) or the arrow
                         // (split DPAD_*, which are ButtonControlElements and already supported it).
                         binding.elementCustomIconB.setVisibility(View.VISIBLE);
-                        binding.elementIconNoTintCb.setVisibility(View.VISIBLE);
+                        binding.elementIconNoTintCb.setVisibility(View.GONE); // hidden in SyxDroid
                         binding.elementIconNoTintCb.setOnCheckedChangeListener(null);
                         if (element instanceof com.udarmolota.syxdroid.input.DpadControlElement) {
                             binding.elementIconNoTintCb.setChecked(
@@ -452,6 +484,8 @@ public class ControlsEditorActivity extends AppCompatActivity {
                         binding.elementIconS.setVisibility(View.GONE);
                         binding.elementStyleTv.setVisibility(View.GONE);
                         binding.elementStyleS.setVisibility(View.GONE);
+                        binding.elementLabelColorTv.setVisibility(View.GONE);
+                        binding.elementLabelColorS.setVisibility(View.GONE);
                         binding.elementCustomIconB.setVisibility(View.GONE);
                         binding.elementIconNoTintCb.setVisibility(View.GONE);
                         break;
@@ -530,7 +564,7 @@ public class ControlsEditorActivity extends AppCompatActivity {
                         || element.getType() == AbstractControlElement.Type.BUTTON_RECT) {
                     binding.elementBindingsTv.setVisibility(View.VISIBLE);
                     binding.elementBindingsAddIb.setVisibility(View.VISIBLE);
-                    binding.elementTogglingCb.setVisibility(View.VISIBLE);
+                    binding.elementTogglingCb.setVisibility(View.GONE); // hidden in SyxDroid
 
                     binding.elementTogglingCb.setOnCheckedChangeListener(null);
                     binding.elementTogglingCb.setChecked(element.getToggle());
@@ -641,7 +675,7 @@ public class ControlsEditorActivity extends AppCompatActivity {
                     case BUTTON_RECT: {
                         binding.elementBindingsTv.setVisibility(View.VISIBLE);
                         binding.elementBindingsAddIb.setVisibility(View.VISIBLE);
-                        binding.elementTogglingCb.setVisibility(View.VISIBLE);
+                        binding.elementTogglingCb.setVisibility(View.GONE); // hidden in SyxDroid
 
                         binding.elementTogglingCb.setOnCheckedChangeListener(null);
                         binding.elementTogglingCb.setChecked(element.getToggle());

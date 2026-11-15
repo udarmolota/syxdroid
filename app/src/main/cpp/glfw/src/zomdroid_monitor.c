@@ -18,7 +18,11 @@ static GLFWvidmode getVideoMode(void)
     mode.redBits = 8;
     mode.greenBits = 8;
     mode.blueBits = 8;
-    mode.refreshRate = 60;
+    // SyxDroid: the launcher passes the frame rate picked in the instance settings. Songs of Syx
+    // caps its frames at the monitor's refresh rate, so a fixed 60 here was a hidden 60 FPS cap.
+    const char* env = getenv("SYX_REFRESH_RATE");
+    int hz = env ? atoi(env) : 0;
+    mode.refreshRate = (hz >= 10 && hz <= 240) ? hz : 60;
     return mode;
 }
 

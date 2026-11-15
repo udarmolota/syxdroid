@@ -37,6 +37,9 @@ public class ButtonControlElement extends AbstractControlElement {
         super(parentView, elementDescription);
         this.drawable = new ButtonControlDrawable(parentView, elementDescription);
         this.bindings.addAll(Arrays.asList(elementDescription.bindings));
+        // No toggle buttons in SyxDroid: the editor no longer offers it, so a layout that still has
+        // one would keep a key held down with no way to switch it off. Every button is momentary.
+        this.isToggle = false;
     }
 
     @Override
@@ -255,6 +258,16 @@ public class ButtonControlElement extends AbstractControlElement {
         return this.drawable.noTint;
     }
 
+    /** Label colour as stored in the layout: 0 = {@link ControlElementDescription#DEFAULT_LABEL_COLOR}. */
+    public int getLabelColor() {
+        return this.drawable.labelColor;
+    }
+
+    public void setLabelColor(int labelColor) {
+        this.drawable.setLabelColor(labelColor);
+        this.parentView.invalidate();
+    }
+
     public void setNoTint(boolean noTint) {
         if (this.drawable.iconFile != null) {
             this.drawable.setCustomIcon(this.drawable.iconFile, noTint);
@@ -296,13 +309,19 @@ public class ButtonControlElement extends AbstractControlElement {
                 this.drawable.noTint,
                 false);
         description.outlineColor = this.drawable.outlineColor;
+        description.labelColor = this.drawable.labelColor;
         return description;
     }
 
     public class ButtonControlDrawable {
         private static final int PAINT_STROKE_WIDTH = 4;
-        // Strong enough to read on snow and other light ground (was 70 and 1.25 px, capped by the button alpha)
-        private static final int OUTLINE_ALPHA = 170;         // 0..255
+        // Dark rim around the contour, the text and the icon. Fixed, not capped by the button alpha,
+        // so a see-through button still has a dense edge on the game's bright sand and grass.
+        private static final int OUTLINE_ALPHA = 200;         // 0..255
+        private static final int OUTLINE_RGB = 0xFF282828;   // rgb(40, 40, 40)
+        // Dark plate inside every button, whatever its style: the label sits on it, not on the map
+        private static final int PLATE_ALPHA = 90;            // ~35 %
+        private static final float ICON_OUTLINE_PX = 1.5f;
         //private static final float OUTLINE_EXTRA_PX = 5f;
         private static final float OUTLINE_EXTRA_PX = 3f;
         private static final float TEXT_OUTLINE_PX = 2.5f; //4f;
@@ -332,10 +351,14 @@ public class ButtonControlElement extends AbstractControlElement {
         private String iconFile;      // user image filename in controls/icons, or null
         private boolean noTint;       // keep custom image original colors when true
         private int outlineColor;     // contour colour, 0 = the button colour
+        private int labelColor;       // text / tinted icon colour, 0 = DEFAULT_LABEL_COLOR
+        private final ColorFilter outlineFilter = new android.graphics.PorterDuffColorFilter(
+                OUTLINE_RGB, android.graphics.PorterDuff.Mode.SRC_IN);
 
         public ButtonControlDrawable(InputControlsView parent, ControlElementDescription description) {
             this.type = description.type;
             this.outlineColor = description.outlineColor;
+            this.labelColor = description.labelColor;
 
             setColor(description.color);
             setAlpha(description.alpha);
@@ -371,7 +394,6 @@ public class ButtonControlElement extends AbstractControlElement {
         }
 
         public void draw(@NonNull Canvas canvas) {
-            // --- Outline pass (black, a bit thicker) ---
             Paint p = this.shapeDrawable.getPaint();
 
             // Capture the base state from the drawable's own fields, NOT from the paint:
@@ -382,22 +404,25 @@ public class ButtonControlElement extends AbstractControlElement {
             int oldAlpha = this.alpha;
             float oldStroke = p.getStrokeWidth();
             ColorFilter oldFilter = this.colorFilter;
+            Paint.Style oldPaintStyle = p.getStyle();
+            // A button made fully transparent stays invisible: no plate, no rims
+            int rimAlpha = oldAlpha == 0 ? 0 : OUTLINE_ALPHA;
+
+            // --- Dark plate, every style: gives the label a calm background on any terrain ---
+            p.setStyle(Paint.Style.FILL);
+            p.setColor(android.graphics.Color.BLACK);
+            p.setAlpha(Math.min(PLATE_ALPHA, oldAlpha));
+            p.setColorFilter(null);
+            this.shapeDrawable.draw(canvas);
 
             // --- Fill pass (for FILLED / GLASS styles) ---
             if (this.style == ControlElementDescription.Style.FILLED
                     || this.style == ControlElementDescription.Style.GLASS) {
-                Paint.Style oldPaintStyle = p.getStyle();
-                p.setStyle(Paint.Style.FILL);
                 p.setColor(oldColor);
                 p.setAlpha(this.style == ControlElementDescription.Style.GLASS
                         ? Math.round(oldAlpha / 3f) : oldAlpha);
                 p.setColorFilter(oldFilter);
                 this.shapeDrawable.draw(canvas);
-                // restore for the outline/normal stroke passes below
-                p.setStyle(oldPaintStyle);
-                p.setColor(oldColor);
-                p.setAlpha(oldAlpha);
-                p.setColorFilter(oldFilter);
             }
 
             boolean toggledOn = getToggle() && ButtonControlElement.this.isToggledOn && !parentView.isEditMode;
@@ -406,21 +431,16 @@ public class ButtonControlElement extends AbstractControlElement {
             //     (so the ON indicator matches the button's drawing style). ---
             if (toggledOn && (this.style == ControlElementDescription.Style.FILLED
                     || this.style == ControlElementDescription.Style.GLASS)) {
-                Paint.Style onStyle = p.getStyle();
-                p.setStyle(Paint.Style.FILL);
                 p.setColor(TOGGLE_ON_COLOR);
                 p.setAlpha(200);
                 p.setColorFilter(null);
                 this.shapeDrawable.draw(canvas);
-                p.setStyle(onStyle);
-                p.setColor(oldColor);
-                p.setAlpha(oldAlpha);
-                p.setColorFilter(oldFilter);
             }
+            p.setStyle(oldPaintStyle);
 
-            p.setColor(android.graphics.Color.rgb(40, 40, 40));
-            //p.setAlpha(OUTLINE_ALPHA);
-            p.setAlpha(OUTLINE_ALPHA);
+            // --- Dark rim under the contour, a bit thicker ---
+            p.setColor(OUTLINE_RGB);
+            p.setAlpha(rimAlpha);
             p.setStrokeWidth(oldStroke + OUTLINE_EXTRA_PX * parentView.pixelScale);
             p.setColorFilter(null);
             this.shapeDrawable.draw(canvas);
@@ -439,28 +459,35 @@ public class ButtonControlElement extends AbstractControlElement {
             p.setColorFilter(oldFilter);
 
             if (this.iconDrawable != null) {
+                // Dark rim around the icon: its silhouette in dark grey, drawn at four offsets
+                if (rimAlpha > 0) {
+                    float o = ICON_OUTLINE_PX * parentView.pixelScale;
+                    this.iconDrawable.setColorFilter(this.outlineFilter);
+                    this.iconDrawable.setAlpha(rimAlpha);
+                    float[][] offsets = {{-o, 0}, {o, 0}, {0, -o}, {0, o}};
+                    for (float[] d : offsets) {
+                        canvas.save();
+                        canvas.translate(d[0], d[1]);
+                        this.iconDrawable.draw(canvas);
+                        canvas.restore();
+                    }
+                    this.iconDrawable.setAlpha(oldAlpha);
+                }
                 if (toggledOn) {
                     // Tint the inner image/letter with the ON color too (not just the contour).
                     this.iconDrawable.setColorFilter(new android.graphics.PorterDuffColorFilter(
                             TOGGLE_ON_COLOR, android.graphics.PorterDuff.Mode.SRC_ATOP));
-                    this.iconDrawable.draw(canvas);
-                    this.iconDrawable.setColorFilter(this.colorFilter); // restore
                 } else {
-                    this.iconDrawable.draw(canvas);
+                    this.iconDrawable.setColorFilter(this.colorFilter);
                 }
+                this.iconDrawable.draw(canvas);
+                this.iconDrawable.setColorFilter(this.colorFilter); // restore
             } else if (this.text != null) {
                 float o = TEXT_OUTLINE_PX * parentView.pixelScale;
 
-                // сохраняем параметры (берём из полей, а не из «загрязнённой» краски — см. выше)
-                int oldTextColor = this.color;
-                int oldTextAlpha = this.alpha;
-                ColorFilter oldTextFilter = this.colorFilter;
-
-                // outline pass: чёрный без фильтра
-                //this.textPaint.setColor(android.graphics.Color.BLACK);
-                this.textPaint.setColor(android.graphics.Color.rgb(40, 40, 40));
-                //this.textPaint.setAlpha(OUTLINE_ALPHA);
-                this.textPaint.setAlpha(Math.min(oldAlpha, OUTLINE_ALPHA));
+                // outline pass: dark grey, no filter, dense whatever the button alpha
+                this.textPaint.setColor(OUTLINE_RGB);
+                this.textPaint.setAlpha(rimAlpha);
                 this.textPaint.setColorFilter(null);
 
                 canvas.drawText(this.text, this.centerX - o, this.textY, this.textPaint);
@@ -468,12 +495,22 @@ public class ButtonControlElement extends AbstractControlElement {
                 canvas.drawText(this.text, this.centerX, this.textY - o, this.textPaint);
                 canvas.drawText(this.text, this.centerX, this.textY + o, this.textPaint);
 
-                // normal pass: вернуть как было (но при включённом тогле — оранжевым, как контур)
-                this.textPaint.setColor(toggledOn ? TOGGLE_ON_COLOR : oldTextColor);
-                this.textPaint.setAlpha(oldTextAlpha);
-                this.textPaint.setColorFilter(toggledOn ? null : oldTextFilter);
+                // normal pass: the label colour (orange while a toggle is on, like the contour)
+                this.textPaint.setColor(toggledOn ? TOGGLE_ON_COLOR : effectiveLabelColor());
+                this.textPaint.setAlpha(oldAlpha);
+                this.textPaint.setColorFilter(toggledOn ? null : oldFilter);
                 canvas.drawText(this.text, this.centerX, this.textY, this.textPaint);
             }
+        }
+
+        private int effectiveLabelColor() {
+            return this.labelColor != 0 ? this.labelColor : ControlElementDescription.DEFAULT_LABEL_COLOR;
+        }
+
+        public void setLabelColor(int labelColor) {
+            this.labelColor = labelColor;
+            if (this.iconDrawable != null && shouldTintIcon())
+                this.iconDrawable.setTint(effectiveLabelColor());
         }
 
         public boolean isPointOver(float x, float y) {
@@ -485,7 +522,7 @@ public class ButtonControlElement extends AbstractControlElement {
             this.shapeDrawable.getPaint().setColor(this.color);
             this.textPaint.setColor(this.color);
             if (this.iconDrawable != null && shouldTintIcon())
-                iconDrawable.setTint(this.color);
+                iconDrawable.setTint(effectiveLabelColor());
         }
 
         private boolean shouldTintIcon() {
@@ -551,7 +588,7 @@ public class ButtonControlElement extends AbstractControlElement {
                     this.iconDrawable = null;
                 } else {
                     this.iconDrawable = shared.mutate();
-                    this.iconDrawable.setTint(this.color);
+                    this.iconDrawable.setTint(effectiveLabelColor());
                     this.iconDrawable.setAlpha(this.alpha);
                     this.iconDrawable.setColorFilter(this.colorFilter);
                     updateIconDrawable();
@@ -579,7 +616,7 @@ public class ButtonControlElement extends AbstractControlElement {
             this.iconFile = fileName;
             BitmapDrawable bd = new BitmapDrawable(parentView.getResources(), bmp);
             if (shouldTintIcon()) {
-                bd.setTint(this.color);
+                bd.setTint(effectiveLabelColor());
             } else {
                 bd.setTintList(null);
             }

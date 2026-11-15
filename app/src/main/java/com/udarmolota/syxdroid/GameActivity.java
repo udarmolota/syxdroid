@@ -230,6 +230,14 @@ public class GameActivity extends AppCompatActivity implements GamepadManager.Ga
                 }
 
                 GameLauncher.setSurface(gameSurface, width, height);
+                // Tell Android the game's frame rate, so the screen runs at it (up to 120 Hz)
+                // instead of the default 60, and lower for 30 to save the battery.
+                try {
+                    gameSurface.setFrameRate(instanceSettings.getFpsLimit(),
+                            android.view.Surface.FRAME_RATE_COMPATIBILITY_DEFAULT);
+                } catch (RuntimeException e) {
+                    Log.w(LOG_TAG, "setFrameRate failed", e);
+                }
 
                 if (!isGameStarted) {
                     Thread thread = new Thread(() -> {

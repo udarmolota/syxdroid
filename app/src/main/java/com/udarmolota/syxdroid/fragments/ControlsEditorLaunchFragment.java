@@ -34,7 +34,7 @@ public class ControlsEditorLaunchFragment extends Fragment {
     private List<GameInstance> instances;
     private GameInstance selectedInstance = null;
 
-    private static final String BACKGROUND_FILENAME = "editor_background.jpg";
+    public static final String BACKGROUND_FILENAME = "editor_background.jpg";
 
     private final ActivityResultLauncher<String> pickImageLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {

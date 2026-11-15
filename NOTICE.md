@@ -43,6 +43,7 @@ load, by a Java agent (`syxagent`). Each change can be switched off with a JVM a
 | `snake2d.Texture`, `snake2d.TextureHolder` | `GL_TEXTURE_RECTANGLE` becomes `GL_TEXTURE_2D` | Same reason, to match the shaders | `-Dsyx.agent.rectTextures=false` |
 | `snake2d.util.process.Proccesser` | Process-starting methods return `null` | Android has no `java` binary to start the desktop splash screen, error dialog or launcher in a child process | `-Dsyx.agent.noSpawn=false` |
 | `snake2d.GraphicsCardGetter` | The constructor records a fixed text instead of opening a hidden probe window | The Android GLFW backend allows one window per process | `-Dsyx.agent.noProbeWindow=false` |
+| `snake2d.Sleeper` | `sync`, the frame limiter, sleeps until the next frame instead of spinning in `Thread.yield()` for the last part of it | The spin kept a core busy every frame and heated the phone | `-Dsyx.agent.sleep=false` |
 | `org.lwjgl.system.Library` (LWJGL, not the game) | `findResource` finds no native library on the class path | The game jar carries glibc builds of LWJGL's natives, which cannot load on Android; the bionic builds below are used instead | `-Dsyx.agent.noBundledNatives=false` |
 
 Before each start the launcher also writes two keys in the game's own settings file

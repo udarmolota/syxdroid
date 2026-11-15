@@ -10,7 +10,7 @@ import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 
 /**
- * The bytecode side of {@link SyxAgent}. Touches five classes (four of the game's, one of
+ * The bytecode side of {@link SyxAgent}. Touches six classes (five of the game's, one of
  * LWJGL's) and nothing else; every other
  * class is returned untouched (null) without being parsed.
  */
@@ -22,6 +22,7 @@ final class SyxTransformer implements ClassFileTransformer {
     static final String LWJGL_LIBRARY = "org/lwjgl/system/Library";
     private static final String FIND_RESOURCE_DESC = "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;Z)Ljava/net/URL;";
     static final String GPU_PROBE = "snake2d/GraphicsCardGetter";
+    static final String SLEEPER = "snake2d/Sleeper";
     /** What GraphicsCardGetter.version() reports instead of the probe window's GL strings. */
     static final String PROBE_TEXT = "Android (SyxDroid: GPU probe window skipped, see the GL log above)";
 
@@ -50,6 +51,8 @@ final class SyxTransformer implements ClassFileTransformer {
                     return SyxAgent.noBundledNatives ? noBundledNatives(classfileBuffer) : null;
                 case GPU_PROBE:
                     return SyxAgent.noProbeWindow ? skipProbeWindow(classfileBuffer) : null;
+                case SLEEPER:
+                    return SyxAgent.sleep ? sleepingSync(classfileBuffer) : null;
                 default:
                     return null;
             }
@@ -177,6 +180,40 @@ final class SyxTransformer implements ClassFileTransformer {
             return null;
         }
         System.out.println(SyxAgent.TAG + GPU_PROBE + ": probe window skipped");
+        return writer.toByteArray();
+    }
+
+    /**
+     * snake2d.Sleeper.sync(int fps), the game's frame limiter, gets the body
+     * "SyxHooks.sync(fps); return;". The game's own body sleeps 1 ms at a time and spins in
+     * Thread.yield() for the rest of each frame.
+     */
+    static byte[] sleepingSync(byte[] bytes) {
+        ClassReader reader = new ClassReader(bytes);
+        ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
+        final int[] replaced = {0};
+        reader.accept(new ClassVisitor(Opcodes.ASM9, writer) {
+            @Override
+            public MethodVisitor visitMethod(int access, String name, String desc, String sig, String[] exc) {
+                boolean target = name.equals("sync") && desc.equals("(I)V")
+                        && (access & Opcodes.ACC_STATIC) != 0;
+                if (!target) return super.visitMethod(access, name, desc, sig, exc);
+                replaced[0]++;
+                MethodVisitor mv = super.visitMethod(access, name, desc, sig, exc);
+                mv.visitCode();
+                mv.visitVarInsn(Opcodes.ILOAD, 0);
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, HOOKS, "sync", "(I)V", false);
+                mv.visitInsn(Opcodes.RETURN);
+                mv.visitMaxs(0, 0);
+                mv.visitEnd();
+                return null;
+            }
+        }, 0);
+        if (replaced[0] == 0) {
+            System.out.println(SyxAgent.TAG + SLEEPER + ".sync(I)V not found; frame wait left as it is");
+            return null;
+        }
+        System.out.println(SyxAgent.TAG + SLEEPER + ": frame wait sleeps instead of spinning");
         return writer.toByteArray();
     }
 

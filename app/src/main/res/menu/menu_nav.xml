@@ -35,8 +35,12 @@
             android:title="@string/menu_install_controls"
             android:icon="@drawable/ic_controls"
             app:showAsAction="never"/>
+        <!-- Hidden: a custom Vulkan driver only served Zomdroid's Zink renderer. Songs of Syx runs on
+             MobileGlues, which draws through the phone's own GLES driver. The id stays: the nav
+             graph's action uses it. -->
         <item
             android:id="@+id/action_install_driver"
+            android:visible="false"
             android:title="@string/install_driver_menu"
             android:icon="@drawable/mt_icon_driver"
             app:showAsAction="never"/>

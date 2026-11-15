@@ -55,6 +55,15 @@ public class ControlElementDescription {
      * 0 means the contour uses {@link #color}, which is what every layout saved before had.
      */
     public int outlineColor;
+    /**
+     * Buttons only: colour of the label, the text or a tinted icon. 0 means
+     * {@link #DEFAULT_LABEL_COLOR}, so layouts saved before this field existed get the readable
+     * light gold instead of the button colour.
+     */
+    public int labelColor;
+
+    /** Light gold: stays readable on the game's bright sand and grass. */
+    public static final int DEFAULT_LABEL_COLOR = 0xFFF7E2A8;
 
     public static final float DEFAULT_SENSITIVITY = 2.0f;
     public static final Style DEFAULT_STYLE = Style.OUTLINE;

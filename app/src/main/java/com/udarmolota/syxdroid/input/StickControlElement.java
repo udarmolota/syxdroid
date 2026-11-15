@@ -19,6 +19,8 @@ public class StickControlElement extends AbstractControlElement {
     // The ring drawn around sticks (this one and the WASD stick) so they stay visible on snow
     static final int STICK_OUTLINE_COLOR = android.graphics.Color.rgb(255, 152, 0);
     static final int STICK_OUTLINE_ALPHA = 200;
+    /** Dark fill of the WASD and mouse sticks, the same as the buttons' plate. */
+    static final int STICK_FILL_ALPHA = 90;
     private static final float STICK_DEAD_ZONE = 0.3f;
     private final StickControlDrawable drawable;
     int pointerId = -1;

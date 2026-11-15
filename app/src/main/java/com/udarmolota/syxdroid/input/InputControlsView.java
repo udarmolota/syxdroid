@@ -46,7 +46,8 @@ public class InputControlsView extends View {
      * on-screen mouse elements then skip their arrow: the game's cursor already follows them,
      * so the player sees one cursor, as with a real mouse.
      */
-    public boolean gameDrawsCursor = false;
+    // Songs of Syx always draws its own cursor, so our arrow would only be a second one
+    public boolean gameDrawsCursor = true;
     GestureDetector gestureDetector;
     private Gson gson = new Gson();
     private SharedPreferences sharedPreferences;
