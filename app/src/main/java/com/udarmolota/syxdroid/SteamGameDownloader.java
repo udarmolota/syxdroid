@@ -164,6 +164,26 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
      * and the full one appended (as in RimDroid). Appended, it has the lowest priority: it answers
      * only code that asks for "BC" by name, never default lookups (Conscrypt keeps doing HTTPS).
      */
+    private static boolean javaSteamLogInstalled;
+
+    /**
+     * Debug builds: JavaSteam's own log (and its DepotDownloader's debug log) into logcat under
+     * "SyxDroid/JavaSteam", to see which Steam request a Workshop download waits on. Release builds
+     * keep it off: it is chatty and shows every Steam message.
+     */
+    private static synchronized void installJavaSteamLog() {
+        if (javaSteamLogInstalled || !BuildConfig.DEBUG) return;
+        javaSteamLogInstalled = true;
+        in.dragonbra.javasteam.util.log.LogManager.addListener(new in.dragonbra.javasteam.util.log.LogListener() {
+            @Override public void onLog(Class<?> clazz, String message, Throwable throwable) {
+                Log.i("SyxDroid/JavaSteam", (clazz != null ? clazz.getSimpleName() + ": " : "") + message, throwable);
+            }
+            @Override public void onError(Class<?> clazz, String message, Throwable throwable) {
+                Log.e("SyxDroid/JavaSteam", (clazz != null ? clazz.getSimpleName() + ": " : "") + message, throwable);
+            }
+        });
+    }
+
     private static synchronized void installFullBouncyCastle() {
         if (fullBouncyCastleInstalled) return;
         try {
@@ -180,6 +200,7 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
     public void run() {
         try {
             installFullBouncyCastle();
+            installJavaSteamLog();
             steamClient = new SteamClient();
             manager = new CallbackManager(steamClient);
             steamUser = steamClient.getHandler(SteamUser.class);
@@ -314,7 +335,7 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
             progress(appContext.getString(R.string.steam_resuming));
         progress("[attempt " + downloadAttempts + "] app " + SOS_APP_ID + ", depot " + SOS_LINUX_DEPOT
                 + ", branch " + BRANCH);
-        try (DepotDownloader dd = new DepotDownloader(steamClient, licenseList, /* debug */ false,
+        try (DepotDownloader dd = new DepotDownloader(steamClient, licenseList, /* debug */ BuildConfig.DEBUG,
                 /* useLanCache */ false, DL_MAX_DOWNLOADS, DL_MAX_DECOMPRESS)) {
             dd.addListener(this);
             AppItem item = new AppItem(
@@ -416,7 +437,7 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
             File dir = new File(work, String.valueOf(id));
             FileUtils.deleteDirectory(dir);
             lastError = null;
-            try (DepotDownloader dd = new DepotDownloader(steamClient, licenseList, /* debug */ false,
+            try (DepotDownloader dd = new DepotDownloader(steamClient, licenseList, /* debug */ BuildConfig.DEBUG,
                     /* useLanCache */ false, DL_MAX_DOWNLOADS, DL_MAX_DECOMPRESS)) {
                 dd.addListener(this);
                 // Not PubFileItem: JavaSteam's own look-up of the item (PublishedFile service) never
