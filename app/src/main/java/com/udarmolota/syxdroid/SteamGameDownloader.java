@@ -15,7 +15,6 @@ import in.dragonbra.javasteam.depotdownloader.DepotDownloader;
 import in.dragonbra.javasteam.depotdownloader.IDownloadListener;
 import in.dragonbra.javasteam.depotdownloader.data.AppItem;
 import in.dragonbra.javasteam.depotdownloader.data.DownloadItem;
-import in.dragonbra.javasteam.depotdownloader.data.PubFileItem;
 import in.dragonbra.javasteam.enums.EResult;
 import in.dragonbra.javasteam.steam.authentication.AuthPollResult;
 import in.dragonbra.javasteam.steam.authentication.AuthSessionDetails;
@@ -105,7 +104,7 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
     }
 
     /**
-     * Workshop mode: instead of the game, these Workshop items are downloaded (PubFileItem) into the
+     * Workshop mode: instead of the game, these Workshop items are downloaded into the
      * mods folder of the instance named. Songs of Syx's Workshop files are not given to anonymous
      * accounts, so the player's sign-in is needed, as for the game.
      */
@@ -420,8 +419,27 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
             try (DepotDownloader dd = new DepotDownloader(steamClient, licenseList, /* debug */ false,
                     /* useLanCache */ false, DL_MAX_DOWNLOADS, DL_MAX_DECOMPRESS)) {
                 dd.addListener(this);
-                dd.add(new PubFileItem(SOS_APP_ID, id, /* installToGameNameDirectory */ false,
-                        dir.getAbsolutePath()));                 // absolute: required on Android
+                // Not PubFileItem: JavaSteam's own look-up of the item (PublishedFile service) never
+                // answered on Songs of Syx items and the download sat at 0 % (2026-11-16). The item's
+                // content manifest comes from Steam's public Web API instead, and the item is then
+                // downloaded as what it is: a manifest of the app's Workshop depot (depot id = app id),
+                // which is what PubFileItem would have done after the look-up.
+                long manifest = workshopManifest(id);
+                dd.add(new AppItem(
+                        /* appId */ SOS_APP_ID,
+                        /* installToGameNameDirectory */ false,
+                        /* installDirectory */ dir.getAbsolutePath(),   // absolute: required on Android
+                        /* branch */ BRANCH,
+                        /* branchPassword */ "",
+                        /* downloadAllPlatforms */ true,
+                        /* os */ "linux",
+                        /* downloadAllArchs */ true,
+                        /* osArch */ "64",
+                        /* downloadAllLanguages */ true,
+                        /* language */ "english",
+                        /* lowViolence */ false,
+                        /* depot */ List.of(SOS_APP_ID),
+                        /* manifest */ List.of(manifest)));
                 dd.finishAdding();
                 dd.getCompletion().get();
                 dd.removeListener(this);
@@ -447,6 +465,43 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
         if (!failedNames.isEmpty())
             message += "\n\n" + appContext.getString(R.string.steam_mods_some_failed, String.join(", ", failedNames));
         finish(message, done > 0);
+    }
+
+    /**
+     * The content manifest (hcontent_file) of a Workshop item, from Steam's public Web API
+     * (ISteamRemoteStorage/GetPublishedFileDetails, no key needed). Fails for an item that is
+     * missing, hidden, or not a Songs of Syx item.
+     */
+    private static long workshopManifest(long id) throws java.io.IOException {
+        java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(
+                "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/").openConnection();
+        c.setRequestMethod("POST");
+        c.setDoOutput(true);
+        c.setConnectTimeout(15000);
+        c.setReadTimeout(15000);
+        c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        try (java.io.OutputStream os = c.getOutputStream()) {
+            os.write(("itemcount=1&publishedfileids%5B0%5D=" + id).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        }
+        StringBuilder sb = new StringBuilder();
+        try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(
+                c.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = r.readLine()) != null) sb.append(line);
+        } finally {
+            c.disconnect();
+        }
+        try {
+            org.json.JSONObject d = new org.json.JSONObject(sb.toString()).getJSONObject("response")
+                    .getJSONArray("publishedfiledetails").getJSONObject(0);
+            if (d.optInt("result", 0) != 1) throw new java.io.IOException("item " + id + " is not available (result " + d.optInt("result") + ")");
+            if (d.optInt("consumer_app_id", SOS_APP_ID) != SOS_APP_ID) throw new java.io.IOException("item " + id + " is not a Songs of Syx item");
+            long manifest = Long.parseLong(d.optString("hcontent_file", "0"));
+            if (manifest == 0) throw new java.io.IOException("item " + id + " has no content");
+            return manifest;
+        } catch (org.json.JSONException | NumberFormatException e) {
+            throw new java.io.IOException("could not read the details of item " + id + ": " + e.getMessage());
+        }
     }
 
     private static final String GAME_JAR = "SongsOfSyx.jar";
