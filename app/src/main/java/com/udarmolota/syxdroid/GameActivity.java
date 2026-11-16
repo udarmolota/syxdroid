@@ -342,6 +342,27 @@ public class GameActivity extends AppCompatActivity implements GamepadManager.Ga
               }
           }
 
+          // A real mouse or touchpad: Android delivers each of its clicks twice, as these touch
+          // events and as ACTION_BUTTON_PRESS / RELEASE (onGenericMotionEvent). The buttons are
+          // sent to the game from there only; here the pointer just moves the cursor. Pressing
+          // in both places gave the game press-press-release-release, and menus such as the new
+          // game and load screens ignored the click. A tap on a touchpad set to tap-to-click has
+          // no button state and no button event, so it still clicks from here.
+          if (isMouseEvent(e, idx) && !leftPressedFinger
+                  && !(action == MotionEvent.ACTION_DOWN && e.getButtonState() == 0)) {
+              if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                  activePointerId = e.getPointerId(idx);
+              }
+              int p = activePointerId >= 0 ? e.findPointerIndex(activePointerId) : idx;
+              if (p < 0) p = idx;
+              InputNativeInterface.sendCursorPos(e.getX(p) * renderScale, e.getY(p) * renderScale);
+              if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                  syncMouseReleaseFromMask(e.getButtonState());
+                  activePointerId = -1;
+              }
+              return true;
+          }
+
           switch (action) {
               case MotionEvent.ACTION_DOWN:
               case MotionEvent.ACTION_POINTER_DOWN: {
@@ -915,6 +936,17 @@ public class GameActivity extends AppCompatActivity implements GamepadManager.Ga
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int kc = event.getKeyCode();
+        // Back is Esc while the game runs. Many tablet keyboards send their Esc key as Back, and
+        // the back gesture would otherwise close the game screen and lose unsaved progress; as Esc
+        // both open the game's own menu, and the player leaves through the game.
+        if (kc == KeyEvent.KEYCODE_BACK && isGameStarted) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                InputNativeInterface.sendKeyboard(GLFWBinding.KEY_ESCAPE.code, true);
+            } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                InputNativeInterface.sendKeyboard(GLFWBinding.KEY_ESCAPE.code, false);
+            }
+            return true;
+        }
         if (kc == KeyEvent.KEYCODE_BACK
                 || kc == KeyEvent.KEYCODE_VOLUME_UP
                 || kc == KeyEvent.KEYCODE_VOLUME_DOWN
