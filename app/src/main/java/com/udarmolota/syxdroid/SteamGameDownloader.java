@@ -157,6 +157,51 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
 
     private static boolean fullBouncyCastleInstalled;
 
+    private static boolean javaSteamLogInstalled;
+    /**
+     * The last error JavaSteam's DepotDownloader logged. It logs some refusals (such as conflicting
+     * options) and then stops without completing or failing its download, so a wait on the
+     * completion alone would never end; {@link #awaitDownload} watches this too.
+     */
+    private static volatile String lastDepotDownloaderError;
+
+    /**
+     * JavaSteam's own log into logcat under "SyxDroid/JavaSteam": errors always (and remembered for
+     * {@link #awaitDownload}), everything else in debug builds only, where it shows which Steam
+     * request a download waits on. Release builds keep the chatty part off.
+     */
+    private static synchronized void installJavaSteamLog() {
+        if (javaSteamLogInstalled) return;
+        javaSteamLogInstalled = true;
+        in.dragonbra.javasteam.util.log.LogManager.addListener(new in.dragonbra.javasteam.util.log.LogListener() {
+            @Override public void onLog(Class<?> clazz, String message, Throwable throwable) {
+                if (BuildConfig.DEBUG)
+                    Log.i("SyxDroid/JavaSteam", (clazz != null ? clazz.getSimpleName() + ": " : "") + message, throwable);
+            }
+            @Override public void onError(Class<?> clazz, String message, Throwable throwable) {
+                Log.e("SyxDroid/JavaSteam", (clazz != null ? clazz.getSimpleName() + ": " : "") + message, throwable);
+                if (clazz == DepotDownloader.class) lastDepotDownloaderError = message;
+            }
+        });
+    }
+
+    /**
+     * Waits for the download to complete, but gives up when DepotDownloader logged an error or the
+     * player cancelled: some of its refusals never complete the download (see above).
+     */
+    private void awaitDownload(DepotDownloader dd) throws Exception {
+        while (true) {
+            try {
+                dd.getCompletion().get(1, java.util.concurrent.TimeUnit.SECONDS);
+                return;
+            } catch (java.util.concurrent.TimeoutException e) {
+                String err = lastDepotDownloaderError;
+                if (err != null) throw new java.io.IOException(err);
+                if (cancelled) throw new InterruptedException("cancelled");
+            }
+        }
+    }
+
     /**
      * JavaSteam saves depot manifests with {@code MessageDigest.getInstance("SHA-1", "BC")}. Android's
      * own provider named "BC" is a trimmed BouncyCastle without SHA-1, and adding the full one
@@ -164,26 +209,6 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
      * and the full one appended (as in RimDroid). Appended, it has the lowest priority: it answers
      * only code that asks for "BC" by name, never default lookups (Conscrypt keeps doing HTTPS).
      */
-    private static boolean javaSteamLogInstalled;
-
-    /**
-     * Debug builds: JavaSteam's own log (and its DepotDownloader's debug log) into logcat under
-     * "SyxDroid/JavaSteam", to see which Steam request a Workshop download waits on. Release builds
-     * keep it off: it is chatty and shows every Steam message.
-     */
-    private static synchronized void installJavaSteamLog() {
-        if (javaSteamLogInstalled || !BuildConfig.DEBUG) return;
-        javaSteamLogInstalled = true;
-        in.dragonbra.javasteam.util.log.LogManager.addListener(new in.dragonbra.javasteam.util.log.LogListener() {
-            @Override public void onLog(Class<?> clazz, String message, Throwable throwable) {
-                Log.i("SyxDroid/JavaSteam", (clazz != null ? clazz.getSimpleName() + ": " : "") + message, throwable);
-            }
-            @Override public void onError(Class<?> clazz, String message, Throwable throwable) {
-                Log.e("SyxDroid/JavaSteam", (clazz != null ? clazz.getSimpleName() + ": " : "") + message, throwable);
-            }
-        });
-    }
-
     private static synchronized void installFullBouncyCastle() {
         if (fullBouncyCastleInstalled) return;
         try {
@@ -446,23 +471,26 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
                 // downloaded as what it is: a manifest of the app's Workshop depot (depot id = app id),
                 // which is what PubFileItem would have done after the look-up.
                 long manifest = workshopManifest(id);
+                lastDepotDownloaderError = null;
                 dd.add(new AppItem(
                         /* appId */ SOS_APP_ID,
                         /* installToGameNameDirectory */ false,
                         /* installDirectory */ dir.getAbsolutePath(),   // absolute: required on Android
                         /* branch */ BRANCH,
                         /* branchPassword */ "",
-                        /* downloadAllPlatforms */ true,
+                        // As for the game: with the depot and manifest given they filter nothing,
+                        // but "all platforms" together with an os is refused (and then hangs).
+                        /* downloadAllPlatforms */ false,
                         /* os */ "linux",
-                        /* downloadAllArchs */ true,
+                        /* downloadAllArchs */ false,
                         /* osArch */ "64",
-                        /* downloadAllLanguages */ true,
+                        /* downloadAllLanguages */ false,
                         /* language */ "english",
                         /* lowViolence */ false,
                         /* depot */ List.of(SOS_APP_ID),
                         /* manifest */ List.of(manifest)));
                 dd.finishAdding();
-                dd.getCompletion().get();
+                awaitDownload(dd);
                 dd.removeListener(this);
                 if (lastError != null) throw new java.io.IOException(describe(lastError));
                 String folder = com.udarmolota.syxdroid.game.SyxModImporter.installFolder(dir, gi, String.valueOf(id));
