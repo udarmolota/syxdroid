@@ -15,6 +15,7 @@ import in.dragonbra.javasteam.depotdownloader.DepotDownloader;
 import in.dragonbra.javasteam.depotdownloader.IDownloadListener;
 import in.dragonbra.javasteam.depotdownloader.data.AppItem;
 import in.dragonbra.javasteam.depotdownloader.data.DownloadItem;
+import in.dragonbra.javasteam.depotdownloader.data.UgcItem;
 import in.dragonbra.javasteam.enums.EResult;
 import in.dragonbra.javasteam.steam.authentication.AuthPollResult;
 import in.dragonbra.javasteam.steam.authentication.AuthSessionDetails;
@@ -465,30 +466,18 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
             try (DepotDownloader dd = new DepotDownloader(steamClient, licenseList, /* debug */ BuildConfig.DEBUG,
                     /* useLanCache */ false, DL_MAX_DOWNLOADS, DL_MAX_DECOMPRESS)) {
                 dd.addListener(this);
-                // Not PubFileItem: JavaSteam's own look-up of the item (PublishedFile service) never
-                // answered on Songs of Syx items and the download sat at 0 % (2026-11-16). The item's
-                // content manifest comes from Steam's public Web API instead, and the item is then
-                // downloaded as what it is: a manifest of the app's Workshop depot (depot id = app id),
-                // which is what PubFileItem would have done after the look-up.
-                long manifest = workshopManifest(id);
+                // How the item gets here (2026-11-16):
+                //  - PubFileItem: JavaSteam's look-up of the item (PublishedFile service) never
+                //    answered on Songs of Syx items, and the download sat at 0 %;
+                //  - AppItem with the Workshop depot (= app id) and the item's manifest: refused,
+                //    "Depot 1162750 not listed for app 1162750" — the app's info lists no such depot;
+                //  - so UgcItem: the item's content handle (hcontent_file, from Steam's public Web
+                //    API) is looked up through Steam Cloud, and the download is marked as Workshop
+                //    content, which skips that depot check.
+                long ugc = workshopManifest(id);
                 lastDepotDownloaderError = null;
-                dd.add(new AppItem(
-                        /* appId */ SOS_APP_ID,
-                        /* installToGameNameDirectory */ false,
-                        /* installDirectory */ dir.getAbsolutePath(),   // absolute: required on Android
-                        /* branch */ BRANCH,
-                        /* branchPassword */ "",
-                        // As for the game: with the depot and manifest given they filter nothing,
-                        // but "all platforms" together with an os is refused (and then hangs).
-                        /* downloadAllPlatforms */ false,
-                        /* os */ "linux",
-                        /* downloadAllArchs */ false,
-                        /* osArch */ "64",
-                        /* downloadAllLanguages */ false,
-                        /* language */ "english",
-                        /* lowViolence */ false,
-                        /* depot */ List.of(SOS_APP_ID),
-                        /* manifest */ List.of(manifest)));
+                dd.add(new UgcItem(SOS_APP_ID, ugc, /* installToGameNameDirectory */ false,
+                        dir.getAbsolutePath()));                        // absolute: required on Android
                 dd.finishAdding();
                 awaitDownload(dd);
                 dd.removeListener(this);
