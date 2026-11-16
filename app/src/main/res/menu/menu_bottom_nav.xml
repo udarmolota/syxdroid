@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Bottom bar of the launcher (as in RimDroid). Item ids are the destination ids, so NavigationUI
-     switches between them and highlights the current one. A "Mods" tab is planned next. -->
+     switches between them and highlights the current one. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/launcher_fragment"
@@ -14,13 +14,13 @@
         android:id="@+id/transfer_fragment"
         android:icon="@drawable/ic_nav_transfer"
         android:title="@string/bottom_nav_transfer" />
-    <item
-        android:id="@+id/projects_fragment"
-        android:icon="@drawable/ic_nav_projects"
-        android:title="@string/bottom_nav_projects" />
     <!-- The Steam Workshop: Songs of Syx mods, downloaded with the player's Steam sign-in -->
     <item
         android:id="@+id/workshop_fragment"
         android:icon="@drawable/ic_steam"
         android:title="@string/bottom_nav_workshop" />
+    <item
+        android:id="@+id/projects_fragment"
+        android:icon="@drawable/ic_nav_projects"
+        android:title="@string/bottom_nav_projects" />
 </menu>
