@@ -18,9 +18,9 @@
         android:id="@+id/projects_fragment"
         android:icon="@drawable/ic_nav_projects"
         android:title="@string/bottom_nav_projects" />
-    <!-- Not a page: opens the controls editor straight away (LauncherActivity.openControlsEditor) -->
+    <!-- The Steam Workshop: Songs of Syx mods, downloaded with the player's Steam sign-in -->
     <item
-        android:id="@+id/action_bottom_controls_editor"
-        android:icon="@drawable/ic_nav_controls"
-        android:title="@string/bottom_nav_controls" />
+        android:id="@+id/workshop_fragment"
+        android:icon="@drawable/ic_steam"
+        android:title="@string/bottom_nav_workshop" />
 </menu>

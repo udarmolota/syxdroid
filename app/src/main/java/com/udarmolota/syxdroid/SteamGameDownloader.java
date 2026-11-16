@@ -15,6 +15,7 @@ import in.dragonbra.javasteam.depotdownloader.DepotDownloader;
 import in.dragonbra.javasteam.depotdownloader.IDownloadListener;
 import in.dragonbra.javasteam.depotdownloader.data.AppItem;
 import in.dragonbra.javasteam.depotdownloader.data.DownloadItem;
+import in.dragonbra.javasteam.depotdownloader.data.PubFileItem;
 import in.dragonbra.javasteam.enums.EResult;
 import in.dragonbra.javasteam.steam.authentication.AuthPollResult;
 import in.dragonbra.javasteam.steam.authentication.AuthSessionDetails;
@@ -100,11 +101,32 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
     private volatile Throwable lastError;
 
     public SteamGameDownloader(Context context, String username, String password, Listener listener) {
+        this(context, username, password, listener, null, null, null);
+    }
+
+    /**
+     * Workshop mode: instead of the game, these Workshop items are downloaded (PubFileItem) into the
+     * mods folder of the instance named. Songs of Syx's Workshop files are not given to anonymous
+     * accounts, so the player's sign-in is needed, as for the game.
+     */
+    public SteamGameDownloader(Context context, String username, String password, Listener listener,
+                               long[] modIds, String[] modTitles, String modInstance) {
         this.appContext = context.getApplicationContext();
         this.username = username;
         this.password = password;
         this.listener = listener;
+        this.modIds = modIds;
+        this.modTitles = modTitles;
+        this.modInstance = modInstance;
     }
+
+    private final long[] modIds;
+    private final String[] modTitles;
+    private final String modInstance;
+    /** Workshop mode: the item being downloaded, for the overall percentage. */
+    private volatile int modIndex;
+
+    private boolean modsMode() { return modIds != null && modIds.length > 0; }
 
     /** The resumable work folder: in the app's storage, next to the instances. */
     static File workDir() {
@@ -281,6 +303,10 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
     }
 
     private void download() {
+        if (modsMode()) {
+            downloadMods();
+            return;
+        }
         downloadInProgress = true;
         downloadAttempts++;
         lastError = null;
@@ -366,6 +392,63 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
         }
     }
 
+    /**
+     * Workshop mode: each item into its own work folder, then moved into the instance's mods folder,
+     * named by its Workshop id (stable when the mod is downloaded again to update it; the mods screen
+     * shows the name from its _Info.txt). A failed item does not stop the others.
+     */
+    private void downloadMods() {
+        downloadInProgress = true;
+        com.udarmolota.syxdroid.game.GameInstance gi =
+                com.udarmolota.syxdroid.game.GameInstanceManager.requireSingleton().getInstanceByName(modInstance);
+        if (gi == null) {
+            finish(appContext.getString(R.string.steam_download_failed, "instance " + modInstance + " not found"), false);
+            return;
+        }
+        File work = new File(workDir(), "workshop");
+        int done = 0;
+        java.util.List<String> failedNames = new java.util.ArrayList<>();
+        for (int i = 0; i < modIds.length && !cancelled; i++) {
+            modIndex = i;
+            long id = modIds[i];
+            String title = modTitles != null && i < modTitles.length && modTitles[i] != null ? modTitles[i] : String.valueOf(id);
+            progress(appContext.getString(R.string.steam_mods_downloading, title, i + 1, modIds.length));
+            listener.onPercent(i * 100 / modIds.length);
+            File dir = new File(work, String.valueOf(id));
+            FileUtils.deleteDirectory(dir);
+            lastError = null;
+            try (DepotDownloader dd = new DepotDownloader(steamClient, licenseList, /* debug */ false,
+                    /* useLanCache */ false, DL_MAX_DOWNLOADS, DL_MAX_DECOMPRESS)) {
+                dd.addListener(this);
+                dd.add(new PubFileItem(SOS_APP_ID, id, /* installToGameNameDirectory */ false,
+                        dir.getAbsolutePath()));                 // absolute: required on Android
+                dd.finishAdding();
+                dd.getCompletion().get();
+                dd.removeListener(this);
+                if (lastError != null) throw new java.io.IOException(describe(lastError));
+                String folder = com.udarmolota.syxdroid.game.SyxModImporter.installFolder(dir, gi, String.valueOf(id));
+                java.nio.file.Files.write(new File(new File(com.udarmolota.syxdroid.game.SyxMods.modsDir(gi), folder),
+                                com.udarmolota.syxdroid.game.SyxMods.WORKSHOP_ID_FILE).toPath(),
+                        String.valueOf(id).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                done++;
+                progress("✓ " + title);
+            } catch (Throwable t) {
+                if (cancelled) return;
+                Log.e(TAG, "Workshop item " + id + " failed", t);
+                failedNames.add(title);
+                progress("✗ " + title + ": " + describe(t));
+            } finally {
+                FileUtils.deleteDirectory(dir);
+            }
+        }
+        FileUtils.deleteDirectory(work);
+        if (cancelled) return;
+        String message = appContext.getString(R.string.steam_mods_done, gi.getName(), done);
+        if (!failedNames.isEmpty())
+            message += "\n\n" + appContext.getString(R.string.steam_mods_some_failed, String.join(", ", failedNames));
+        finish(message, done > 0);
+    }
+
     private static final String GAME_JAR = "SongsOfSyx.jar";
     private static final String BASE_DIR = "base";
 
@@ -391,7 +474,11 @@ public class SteamGameDownloader implements Runnable, IDownloadListener {
         Log.i(TAG, String.format("depot %d: %.1f%% (%s)", depotId, depotPercentComplete * 100f, fileName));
     }
     @Override public void onChunkCompleted(int depotId, float depotPercentComplete, long compressedBytes, long uncompressedBytes) {
-        listener.onPercent(Math.round(depotPercentComplete * 100f));
+        if (modsMode()) {
+            listener.onPercent(Math.round((modIndex + depotPercentComplete) * 100f / modIds.length));
+        } else {
+            listener.onPercent(Math.round(depotPercentComplete * 100f));
+        }
     }
     @Override public void onDepotCompleted(int depotId, long compressedBytes, long uncompressedBytes) {
         progress("Depot done: " + (uncompressedBytes >> 20) + " MB");

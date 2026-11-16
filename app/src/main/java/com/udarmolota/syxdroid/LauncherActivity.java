@@ -78,7 +78,8 @@ public class LauncherActivity extends AppCompatActivity {
     }
     /** The bottom bar's pages (menu_bottom_nav.xml): top level, and the only screens showing the bar. */
     private static final int[] BOTTOM_NAV_DESTINATIONS = {
-            R.id.launcher_fragment, R.id.download_fragment, R.id.transfer_fragment, R.id.projects_fragment};
+            R.id.launcher_fragment, R.id.download_fragment, R.id.workshop_fragment,
+            R.id.transfer_fragment, R.id.projects_fragment};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,14 +135,6 @@ public class LauncherActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.launcherNv, navController);
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
-        // The Controls item is not a page: it opens the editor and leaves the current tab selected.
-        binding.bottomNav.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.action_bottom_controls_editor) {
-                openControlsEditor();
-                return false;
-            }
-            return NavigationUI.onNavDestinationSelected(item, navController);
-        });
         // The bottom bar only on its own pages (as in RimDroid): elsewhere it would eat height.
         navController.addOnDestinationChangedListener((c, dest, args) -> {
             boolean main = false;
@@ -156,6 +149,10 @@ public class LauncherActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.action_new_instance) {
                 binding.drawerLayout.close();
                 pickGameZip();
+                return true;
+            } else if (item.getItemId() == R.id.action_mods) {
+                binding.drawerLayout.close();
+                navController.navigate(R.id.action_open_mods);
                 return true;
             } else if (item.getItemId() == R.id.action_open_controls_editor) {
                 binding.drawerLayout.close();

@@ -168,6 +168,10 @@ public class GameInstance {
             }
         }
         String bootPrefix = bootJoiner.length() > 0 ? bootJoiner + ":" : "";
+        // Songs of Syx: the script jars of the mods that are on, as the game's own launcher adds them
+        if (com.udarmolota.syxdroid.SyxGame.PRESET_NAME.equals(getPresetName())) {
+            for (String jar : SyxMods.scriptJars(this)) jarsJoiner.add(jar);
+        }
         jvmArgsList.add("-Djava.class.path=" + bootPrefix + String.join(":", this.classPath) + ":" + jarsJoiner);
 
         jvmArgsList.addAll(Arrays.asList(this.extraJvmArgs));

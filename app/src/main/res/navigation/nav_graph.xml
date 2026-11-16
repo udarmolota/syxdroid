@@ -32,6 +32,13 @@
     <action
         android:id="@+id/action_open_transfer"
         app:destination="@id/transfer_fragment" />
+    <action
+        android:id="@+id/action_open_mods"
+        app:destination="@id/mods_fragment" />
+    <!-- The Workshop hands its queue to the Game page, which signs in to Steam and downloads -->
+    <action
+        android:id="@+id/action_download_mods"
+        app:destination="@id/download_fragment" />
 
     <!-- The bottom bar's pages (as in RimDroid): the bar's item ids are these destination ids. -->
     <fragment
@@ -39,6 +46,19 @@
         android:name="com.udarmolota.syxdroid.fragments.DownloadFragment"
         android:label="@string/steam_title"
         tools:layout="@layout/fragment_download" />
+
+    <fragment
+        android:id="@+id/workshop_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.WorkshopFragment"
+        android:label="@string/workshop_title"
+        tools:layout="@layout/fragment_workshop" />
+
+    <!-- Mods of an instance, from the side menu (as in RimDroid) -->
+    <fragment
+        android:id="@+id/mods_fragment"
+        android:name="com.udarmolota.syxdroid.fragments.ModsFragment"
+        android:label="@string/nav_mods"
+        tools:layout="@layout/fragment_mods" />
 
     <fragment
         android:id="@+id/transfer_fragment"

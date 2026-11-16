@@ -29,6 +29,16 @@ import java.util.concurrent.CompletableFuture;
  */
 public class DownloadFragment extends Fragment implements SteamDownloadState.View {
 
+    /** Set by the Workshop page: the items to download instead of the game, and where to. */
+    public static final String ARG_MOD_IDS = "mod_ids";
+    public static final String ARG_MOD_TITLES = "mod_titles";
+    public static final String ARG_MOD_INSTANCE = "mod_instance";
+
+    private long[] modIds;
+    private String[] modTitles;
+    private String modInstance;
+    private TextView modsTv;
+
     private EditText userEt, passEt;
     private Button startBtn, cancelBtn;
     private LinearProgressIndicator progress;
@@ -50,6 +60,17 @@ public class DownloadFragment extends Fragment implements SteamDownloadState.Vie
         progress = v.findViewById(R.id.dl_progress_lpi);
         logTv = v.findViewById(R.id.dl_log_tv);
         scroll = v.findViewById(R.id.dl_scroll);
+        modsTv = v.findViewById(R.id.dl_mods_tv);
+
+        Bundle args = getArguments();
+        if (args != null && args.getLongArray(ARG_MOD_IDS) != null) {
+            modIds = args.getLongArray(ARG_MOD_IDS);
+            modTitles = args.getStringArray(ARG_MOD_TITLES);
+            modInstance = args.getString(ARG_MOD_INSTANCE);
+            // Once: coming back to this page later shows the game download again
+            args.remove(ARG_MOD_IDS);
+        }
+        showModsBanner();
 
         startBtn.setOnClickListener(b -> start());
         cancelBtn.setOnClickListener(b -> SteamDownloadState.get().cancel());
@@ -85,10 +106,26 @@ public class DownloadFragment extends Fragment implements SteamDownloadState.Vie
         // The password is handed over once and the field cleared: nothing keeps it on this page.
         passEt.setText("");
         logTv.setText("");
-        SteamDownloadState.get().start(requireContext(), user, pass);
+        if (modIds != null && modIds.length > 0) {
+            SteamDownloadState.get().startMods(requireContext(), user, pass, modIds, modTitles, modInstance);
+            modIds = null;
+            showModsBanner();
+        } else {
+            SteamDownloadState.get().start(requireContext(), user, pass);
+        }
         progress.setVisibility(View.VISIBLE);
         progress.setIndeterminate(true);
         updateButtons();
+    }
+
+    private void showModsBanner() {
+        if (modsTv == null) return;
+        if (modIds != null && modIds.length > 0) {
+            modsTv.setText(getString(R.string.steam_mods_banner, modIds.length, modInstance));
+            modsTv.setVisibility(View.VISIBLE);
+        } else {
+            modsTv.setVisibility(View.GONE);
+        }
     }
 
     private void updateButtons() {
@@ -129,7 +166,14 @@ public class DownloadFragment extends Fragment implements SteamDownloadState.Vie
                 .setTitle(ok ? R.string.steam_done_title : R.string.steam_failed_title)
                 .setMessage(message);
         android.net.Uri zip = SteamDownloadState.get().getLastZip();
-        if (ok && zip != null) {
+        if (ok && SteamDownloadState.get().getLastModsInstance() != null) {
+            dialog.setPositiveButton(R.string.steam_mods_open, (d, w) -> {
+                        android.view.View root = getView();
+                        if (root != null) androidx.navigation.Navigation.findNavController(root)
+                                .navigate(R.id.action_open_mods);
+                    })
+                    .setNegativeButton(android.R.string.ok, null);
+        } else if (ok && zip != null) {
             // A new instance from the zip just made, as in RimDroid; "+" can do it again any time.
             dialog.setPositiveButton(R.string.steam_create_instance, (d, w) -> {
                         android.app.Activity a = getActivity();

@@ -47,6 +47,8 @@ public class GameActivity extends AppCompatActivity implements GamepadManager.Ga
     private Surface gameSurface;
     private static boolean isGameStarted = false;
     static boolean hasGameJvm() { return isGameStarted; }
+    /** Whether the game runs in this process (the launcher's screens use it to stay read-only). */
+    public static boolean isGameRunning() { return isGameStarted; }
 
     // Handles all gamepad connection/disconnection and input events
     private GamepadManager gamepadManager;

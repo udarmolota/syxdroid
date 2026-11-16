@@ -29,8 +29,19 @@
                     android:text="@string/steam_title" />
 
                 <TextView
+                    android:id="@+id/dl_intro_tv"
                     style="@style/AppTheme.TransferCardHint"
                     android:text="@string/steam_intro" />
+
+                <!-- Shown when the Workshop sent mods here: what will be downloaded, and where -->
+                <TextView
+                    android:id="@+id/dl_mods_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/dl_user_til"

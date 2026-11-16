@@ -15,6 +15,11 @@
             android:icon="@drawable/mt_icon_settings"
             app:showAsAction="never"/>
         <item
+            android:id="@+id/action_mods"
+            android:title="@string/nav_mods"
+            android:icon="@drawable/mt_icon_mods"
+            app:showAsAction="never"/>
+        <item
             android:id="@+id/action_open_controls_editor"
             android:title="@string/nav_menu_controls_editor"
             android:icon="@drawable/ic_controls"

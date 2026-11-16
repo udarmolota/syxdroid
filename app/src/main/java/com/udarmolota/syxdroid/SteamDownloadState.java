@@ -47,8 +47,23 @@ public final class SteamDownloadState implements SteamGameDownloader.Listener {
     public int getPercent() { return percent; }
     public boolean isIndeterminate() { return indeterminate; }
 
+    /** The instance the last Workshop download went into, or null after a game download. */
+    private volatile String lastModsInstance;
+    public String getLastModsInstance() { return lastModsInstance; }
+
     /** Starts a download with these credentials; they go to the downloader and nowhere else. */
     public void start(Context context, String username, String password) {
+        startDownload(context, username, password, null, null, null);
+    }
+
+    /** Workshop mode: these items into that instance's mods folder (see SteamGameDownloader). */
+    public void startMods(Context context, String username, String password,
+                          long[] ids, String[] titles, String instance) {
+        startDownload(context, username, password, ids, titles, instance);
+    }
+
+    private void startDownload(Context context, String username, String password,
+                               long[] ids, String[] titles, String instance) {
         if (downloading) return;
         appCtx = context.getApplicationContext();
         synchronized (log) { log.setLength(0); }
@@ -57,8 +72,9 @@ public final class SteamDownloadState implements SteamGameDownloader.Listener {
         percent = -1;
         synchronized (this) { pendingMessage = null; }
         lastZip = null;
+        lastModsInstance = instance;
         DownloadKeepAliveService.start(appCtx, appCtx.getString(R.string.steam_notification));
-        SteamGameDownloader d = new SteamGameDownloader(appCtx, username, password, this);
+        SteamGameDownloader d = new SteamGameDownloader(appCtx, username, password, this, ids, titles, instance);
         active = d;
         new Thread(d, "syx-steam").start();
     }

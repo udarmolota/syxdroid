@@ -23,9 +23,14 @@ rendering, editable touch controls and sound.
   emulated or recompiled
 - ✔️ **In-app download** — get the game from Steam (Steam Guard supported); the download is saved
   as a ZIP in `Download/SyxDroid`
+- ✔️ **Steam Workshop in the app** — browse it, tap ↓ on the mods you want, and they download
+  straight into an instance (needs your Steam sign-in: the game's Workshop is not open to
+  anonymous accounts)
+- ✔️ **Mods screen** (side menu) — switch mods on and off, drag them into load order, delete
+  them, copy them to another instance, install a mod from a ZIP; mods with scripts are loaded too
 - ✔️ **Editable on-screen touch controls** — move, resize, add buttons bound to any key or mouse
   action, pick the label colour, use your own icons; open the editor with **Controls** in the
-  bottom bar
+  side menu
 - ✔️ **Multiple instances** — each install is a card with its own settings and controls
 - ✔️ **Game language** — any language your copy has, or the phone's language
 - ✔️ **Render resolution** — lower it for more FPS and a larger interface
@@ -80,7 +85,7 @@ We'd rather set expectations honestly than overpromise.
 - The top row: **Esc**, **Ctrl**, and the game speeds — pause, 1, 2, 3.
 - **V** hides or shows the controls; hold it to move the buttons around during the game.
   **KB** opens the keyboard.
-- **Controls** in the bottom bar opens the full editor. **Reset** brings back the default layout.
+- **Controls** in the side menu opens the full editor. **Reset** brings back the default layout.
 
 ## Getting the best performance
 
@@ -98,7 +103,7 @@ We'd rather set expectations honestly than overpromise.
 - [x] On-screen controls with an editor
 - [x] Game language, render resolution, frame rate limit
 - [ ] Testing on Mali and Xclipse GPUs and on phones with less RAM
-- [ ] Mods screen
+- [x] Mods screen and Steam Workshop download
 - [ ] In-app wiki
 - [ ] Lower the frame rate automatically when the phone gets too hot
 - [ ] Beta
