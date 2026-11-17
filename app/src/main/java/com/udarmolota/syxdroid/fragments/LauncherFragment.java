@@ -165,6 +165,16 @@ public class LauncherFragment extends Fragment {
                 ImageButton moreIb = itemView.findViewById(R.id.game_instance_item_more_ib);
 
                 nameTv.setText(gameInstance.getName());
+                // The game's version under the name, read from its jar (SyxGameVersion)
+                TextView versionTv = itemView.findViewById(R.id.game_instance_item_version_tv);
+                com.udarmolota.syxdroid.game.SyxGameVersion version =
+                        com.udarmolota.syxdroid.game.SyxGameVersion.of(gameInstance);
+                if (version != null) {
+                    versionTv.setText(getString(R.string.instance_game_version, version.toString()));
+                    versionTv.setVisibility(View.VISIBLE);
+                } else {
+                    versionTv.setVisibility(View.GONE);
+                }
 
                 // The banner is the Deephall art set in the layout; the Project Zomboid build
                 // banners are no longer picked per preset.
@@ -439,7 +449,40 @@ public class LauncherFragment extends Fragment {
         taskProgressDialog.show();
     }
 
+    /**
+     * Mods made for another game version: the game then falls back to one of their old folders
+     * (ModInfo.bestVersion picks the first, not the nearest), and old data usually stops it at
+     * start (seen 2026-11-16: Easy Mod's V65 races lack CHILD_DAYS on 0.71). Asked before starting.
+     */
     private void launchGame(GameInstance gameInstance) {
+        if (com.udarmolota.syxdroid.SyxGame.PRESET_NAME.equals(gameInstance.getPresetName())) {
+            int major = com.udarmolota.syxdroid.game.SyxMods.gameMajor(gameInstance);
+            java.util.List<com.udarmolota.syxdroid.game.SyxMods.Mod> old =
+                    com.udarmolota.syxdroid.game.SyxMods.outdatedActive(gameInstance, major);
+            if (!old.isEmpty()) {
+                StringBuilder list = new StringBuilder();
+                for (com.udarmolota.syxdroid.game.SyxMods.Mod m : old)
+                    list.append("• ").append(m.name).append("  (")
+                        .append(com.udarmolota.syxdroid.game.SyxMods.versionsText(m)).append(")\n");
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.mods_outdated_title)
+                        .setMessage(getString(R.string.mods_outdated_message, "V" + major, list.toString().trim()))
+                        .setPositiveButton(R.string.mods_outdated_disable, (d, w) -> {
+                            java.util.List<String> order = com.udarmolota.syxdroid.game.SyxMods.activeOrder(gameInstance);
+                            for (com.udarmolota.syxdroid.game.SyxMods.Mod m : old) order.remove(m.id);
+                            com.udarmolota.syxdroid.game.SyxMods.writeOrder(gameInstance, order);
+                            startGame(gameInstance);
+                        })
+                        .setNeutralButton(R.string.mods_outdated_start_anyway, (d, w) -> startGame(gameInstance))
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+                return;
+            }
+        }
+        startGame(gameInstance);
+    }
+
+    private void startGame(GameInstance gameInstance) {
         Intent intent = new Intent(requireContext(), GameActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra(GameActivity.EXTRA_GAME_INSTANCE_NAME, gameInstance.getName());

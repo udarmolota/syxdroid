@@ -23,9 +23,9 @@ rendering, editable touch controls and sound.
   emulated or recompiled
 - ✔️ **In-app download** — get the game from Steam (Steam Guard supported); the download is saved
   as a ZIP in `Download/SyxDroid`
-- ✔️ **Steam Workshop in the app** — browse it, tap ↓ on the mods you want, and they download
-  straight into an instance (needs your Steam sign-in: the game's Workshop is not open to
-  anonymous accounts)
+- ✔️ **Mods from mod.io in the app** — browse [mod.io](https://mod.io/g/songsofsyx), open a mod
+  and tap Download; they download in the background into `Download/SyxDroid`, no
+  account needed, and you install them in Mods. Steam Workshop downloads come later
 - ✔️ **Mods screen** (side menu) — switch mods on and off, drag them into load order, delete
   them, copy them to another instance, install a mod from a ZIP; mods with scripts are loaded too
 - ✔️ **Editable on-screen touch controls** — move, resize, add buttons bound to any key or mouse
@@ -103,7 +103,8 @@ We'd rather set expectations honestly than overpromise.
 - [x] On-screen controls with an editor
 - [x] Game language, render resolution, frame rate limit
 - [ ] Testing on Mali and Xclipse GPUs and on phones with less RAM
-- [x] Mods screen and Steam Workshop download
+- [x] Mods screen and mod.io downloads
+- [ ] Steam Workshop downloads
 - [ ] In-app wiki
 - [ ] Lower the frame rate automatically when the phone gets too hot
 - [ ] Beta

@@ -14,10 +14,10 @@
         android:id="@+id/transfer_fragment"
         android:icon="@drawable/ic_nav_transfer"
         android:title="@string/bottom_nav_transfer" />
-    <!-- The Steam Workshop: Songs of Syx mods, downloaded with the player's Steam sign-in -->
+    <!-- Mods online: mod.io in an in-app browser (the Steam Workshop tab is hidden for now) -->
     <item
         android:id="@+id/workshop_fragment"
-        android:icon="@drawable/ic_steam"
+        android:icon="@drawable/ic_nav_workshop"
         android:title="@string/bottom_nav_workshop" />
     <item
         android:id="@+id/projects_fragment"

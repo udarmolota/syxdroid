@@ -799,6 +799,10 @@ public class InstallerService extends Service implements TaskProgressListener {
             writeLogUtf8(zos, "Memory   : saver " + (settings.isMemorySaver() ? "ON" : "off")
                     + ", render scale " + String.format(Locale.US, "%.2f", settings.getRenderScale()) + "\n");
             writeLogUtf8(zos, "FPS limit: " + settings.getFpsLimit() + "\n");
+            // The game's version, from its jar (SyxGameVersion)
+            com.udarmolota.syxdroid.game.SyxGameVersion gameVersion =
+                    gi != null ? com.udarmolota.syxdroid.game.SyxGameVersion.of(gi) : null;
+            writeLogUtf8(zos, "Game     : " + (gameVersion != null ? gameVersion.toString() : "unknown") + "\n");
             String jvmArgs = LauncherPreferences.squashWhitespace(settings.getJvmArgs());
             writeLogUtf8(zos, "JVM args : " + (jvmArgs.isEmpty() ? "(none)" : jvmArgs)
                     + "  [" + LauncherPreferences.describeJvmArgsPreset(jvmArgs) + "]\n");

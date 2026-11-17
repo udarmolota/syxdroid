@@ -118,7 +118,7 @@ public final class SyxMods {
 
     /** The mod in this folder, or null when it has neither an _Info.txt nor a V folder. */
     @Nullable
-    static Mod read(File dir) {
+    public static Mod read(File dir) {
         List<Integer> versions = new ArrayList<>();
         File[] kids = dir.listFiles(File::isDirectory);
         if (kids != null) {
@@ -174,10 +174,13 @@ public final class SyxMods {
     // ---- the game version ----
 
     /**
-     * The game's major version (71 for 0.71), as the game stored it in its settings
-     * (VERSION: major << 16 | minor), or -1 before the instance's first start.
+     * The game's major version (71 for 0.71): from its jar (SyxGameVersion), which is there right
+     * after the import; else as the game stored it in its settings (VERSION: major << 16 | minor),
+     * which it writes only on a clean exit; else -1.
      */
     public static int gameMajor(GameInstance gi) {
+        SyxGameVersion v = SyxGameVersion.of(gi);
+        if (v != null) return v.major;
         File f = settingsFile(gi);
         if (!f.isFile()) return UNKNOWN_VERSION;
         try {
@@ -189,6 +192,29 @@ public final class SyxMods {
             Log.w(TAG, "could not read the game version", e);
         }
         return UNKNOWN_VERSION;
+    }
+
+    /**
+     * The mods that are on but have no folder for this game version (empty when the version is not
+     * known yet, before the instance's first start).
+     */
+    @NonNull
+    public static List<Mod> outdatedActive(GameInstance gi, int gameMajor) {
+        List<Mod> out = new ArrayList<>();
+        if (gameMajor < 0) return out;
+        File mods = modsDir(gi);
+        for (String id : activeOrder(gi)) {
+            Mod m = read(new File(mods, id));
+            if (m != null && !m.supports(gameMajor)) out.add(m);
+        }
+        return out;
+    }
+
+    /** "V65–V70", "V66" or "" : the game versions a mod has folders for. */
+    public static String versionsText(Mod m) {
+        if (m.gameVersions.isEmpty()) return "";
+        int lo = m.gameVersions.get(0), hi = m.gameVersions.get(m.gameVersions.size() - 1);
+        return lo == hi ? "V" + lo : "V" + lo + "–V" + hi;
     }
 
     // ---- MODS, the load order ----

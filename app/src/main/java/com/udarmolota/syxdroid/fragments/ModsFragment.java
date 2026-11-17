@@ -53,7 +53,7 @@ import java.util.Set;
 public class ModsFragment extends Fragment {
 
     private Spinner spInstance;
-    private TextView tvRunning, tvEmpty;
+    private TextView tvRunning, tvEmpty, tvVersion;
     private EditText etSearch;
     private RecyclerView rv;
     private final List<GameInstance> instances = new ArrayList<>();
@@ -75,7 +75,18 @@ public class ModsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pickZip = registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::installZip);
+        // The picker opens in Download/SyxDroid, where Mods online saves the mods it downloads
+        pickZip = registerForActivityResult(new ActivityResultContracts.OpenDocument() {
+            @NonNull
+            @Override
+            public android.content.Intent createIntent(@NonNull android.content.Context context, @NonNull String[] input) {
+                android.content.Intent i = super.createIntent(context, input);
+                i.putExtra(android.provider.DocumentsContract.EXTRA_INITIAL_URI,
+                        android.provider.DocumentsContract.buildDocumentUri(
+                                "com.android.externalstorage.documents", "primary:Download/SyxDroid"));
+                return i;
+            }
+        }, this::installZip);
     }
 
     @Override
@@ -88,6 +99,7 @@ public class ModsFragment extends Fragment {
         super.onViewCreated(v, savedInstanceState);
         spInstance = v.findViewById(R.id.sp_mods_instance);
         tvRunning = v.findViewById(R.id.tv_mods_game_running);
+        tvVersion = v.findViewById(R.id.tv_mods_game_version);
         tvEmpty = v.findViewById(R.id.tv_mods_empty);
         etSearch = v.findViewById(R.id.et_mods_search);
         rv = v.findViewById(R.id.rv_mods);
@@ -147,6 +159,14 @@ public class ModsFragment extends Fragment {
         GameInstance gi = current();
         boolean running = GameActivity.isGameRunning();
         tvRunning.setVisibility(running ? View.VISIBLE : View.GONE);
+        com.udarmolota.syxdroid.game.SyxGameVersion version =
+                gi != null ? com.udarmolota.syxdroid.game.SyxGameVersion.of(gi) : null;
+        if (version != null) {
+            tvVersion.setText(getString(R.string.mods_game_version, version.toString(), "V" + version.major));
+            tvVersion.setVisibility(View.VISIBLE);
+        } else {
+            tvVersion.setVisibility(View.GONE);
+        }
         editable = gi != null && !running;
         btnSort.setEnabled(editable);
         btnEnableAll.setEnabled(editable);
@@ -195,6 +215,22 @@ public class ModsFragment extends Fragment {
     private void toggle(Row r, boolean on) {
         GameInstance gi = current();
         if (gi == null) return;
+        int major = SyxMods.gameMajor(gi);
+        if (on && r.mod != null && !r.mod.supports(major)) {
+            // Made for another game version: the game would load one of its old folders and
+            // usually stop at start. Switched on only on purpose.
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(r.mod.name)
+                    .setMessage(getString(R.string.mods_outdated_switch_on, "V" + major, SyxMods.versionsText(r.mod)))
+                    .setNegativeButton(android.R.string.cancel, (d, w) -> refresh())
+                    .setOnCancelListener(d -> refresh())
+                    .setPositiveButton(R.string.mods_outdated_switch_on_anyway, (d, w) -> {
+                        if (!SyxMods.setActive(gi, r.id, true)) failed();
+                        refresh();
+                    })
+                    .show();
+            return;
+        }
         if (!SyxMods.setActive(gi, r.id, on)) failed();
         refresh();
     }
@@ -619,6 +655,12 @@ public class ModsFragment extends Fragment {
             } else {
                 name.setText(r.mod.name);
                 android.text.SpannableStringBuilder s = new android.text.SpannableStringBuilder(versionsLine(r.mod, major));
+                if (!r.mod.supports(major)) {
+                    // No folder for this game version: red, as the game will likely stop with it
+                    int at = s.length() > 0 ? s.append(" · ").length() : 0;
+                    s.append(getString(R.string.mods_not_for_version, "V" + major));
+                    s.setSpan(new android.text.style.ForegroundColorSpan(0xFFE57373), at, s.length(), 0);
+                }
                 if (!r.mod.author.isEmpty()) s.append(s.length() > 0 ? " · " : "").append(r.mod.author);
                 sub.setText(s);
             }

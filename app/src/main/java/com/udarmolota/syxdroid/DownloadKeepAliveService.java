@@ -93,6 +93,44 @@ public class DownloadKeepAliveService extends Service {
         return START_NOT_STICKY;   // don't auto-restart if killed
     }
 
+    /** Updates the running notification's text and progress (percent < 0: no bar). */
+    public static void update(Context ctx, String text, int percent) {
+        Context app = ctx.getApplicationContext();
+        NotificationManager nm = app.getSystemService(NotificationManager.class);
+        if (nm == null) return;
+        NotificationCompat.Builder b = new NotificationCompat.Builder(app, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentTitle("SyxDroid")
+                .setContentText(text)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW);
+        if (percent >= 0) b.setProgress(100, Math.min(100, percent), false);
+        nm.notify(NOTIF_ID, b.build());
+    }
+
+    /** A notification that stays after the service stops: what a finished download left. */
+    public static void notifyDone(Context ctx, String title, String text) {
+        Context app = ctx.getApplicationContext();
+        NotificationManager nm = app.getSystemService(NotificationManager.class);
+        if (nm == null) return;
+        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
+            nm.createNotificationChannel(new NotificationChannel(CHANNEL_ID, "Downloads", NotificationManager.IMPORTANCE_LOW));
+        }
+        android.content.Intent open = app.getPackageManager().getLaunchIntentForPackage(app.getPackageName());
+        android.app.PendingIntent pi = open == null ? null : android.app.PendingIntent.getActivity(app, 0, open,
+                android.app.PendingIntent.FLAG_IMMUTABLE | android.app.PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(app, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW);
+        if (pi != null) b.setContentIntent(pi);
+        nm.notify(NOTIF_ID + 1, b.build());
+    }
+
     @Override
     public IBinder onBind(Intent intent) { return null; }
 

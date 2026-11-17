@@ -32,6 +32,12 @@ or redistributes them. The optional in-app Steam download signs in to Steam with
 user types; it goes only to Steam, for that sign-in, and is not stored. The downloaded game is
 saved as a zip in the user's own Download/SyxDroid folder. The launcher's icon, logo and banner are original artwork, not the game's.
 
+Mods are not part of SyxDroid either. The "Mods online" page shows the sites of
+[mod.io](https://mod.io/g/songsofsyx) as it is, in an in-app browser;
+when the player asks for a mod, SyxDroid downloads the file the site's own Download button gives
+into the player's Download/SyxDroid folder, and the player installs it. Mods belong to their authors and are used under the terms of the site they
+come from; SyxDroid hosts and redistributes none of them.
+
 ## 3. What SyxDroid changes when it runs the user's copy
 
 **Nothing is written to the game's files.** The game's classes are adapted in memory, while they

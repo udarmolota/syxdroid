@@ -32,16 +32,18 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Every import and export in one screen (as in RimDroid): a card each for the saves, the game's
- * settings and the on-screen controls, with an Import and an Export button. Import picks the file
- * and asks once before it writes anything. Saves and settings are {@link GameDataTransfer} zips,
- * the controls the layout .json the controls editor uses.
+ * settings, the on-screen controls and the mods, with an Import and an Export button. Import picks
+ * the file and asks once before it writes anything. Saves and settings are {@link GameDataTransfer}
+ * zips, the controls the layout .json the controls editor uses, and the mods a ZIP of mod folders
+ * (one or several; exported as all the instance's mod folders) installed by SyxModImporter.
+ * Which mods are on, and their order, is part of the game's settings (MODS).
  *
  * <p>The instance is picked once at the top; with no instance yet there is nothing to export or
  * import into, and the buttons say so.
  */
 public class TransferFragment extends Fragment {
 
-    private static final int NONE = 0, SAVES = 1, SETTINGS = 2, CONTROLS = 3;
+    private static final int NONE = 0, SAVES = 1, SETTINGS = 2, CONTROLS = 3, MODS = 4;
     private static final String STATE_PENDING = "pending";
     private static final String[] ZIP_TYPES = {"application/zip", "application/x-zip-compressed", "application/octet-stream"};
     private static final String[] JSON_TYPES = {"application/json", "text/plain", "application/octet-stream"};
@@ -89,6 +91,8 @@ public class TransferFragment extends Fragment {
         v.findViewById(R.id.btn_transfer_settings_export).setOnClickListener(b -> startExport(SETTINGS));
         v.findViewById(R.id.btn_transfer_controls_import).setOnClickListener(b -> startImport(CONTROLS));
         v.findViewById(R.id.btn_transfer_controls_export).setOnClickListener(b -> startExport(CONTROLS));
+        v.findViewById(R.id.btn_transfer_mods_import).setOnClickListener(b -> startImport(MODS));
+        v.findViewById(R.id.btn_transfer_mods_export).setOnClickListener(b -> startExport(MODS));
     }
 
     @Override
@@ -140,11 +144,14 @@ public class TransferFragment extends Fragment {
         if (file == null) file = uri.getLastPathSegment();
         int message = what == SAVES ? R.string.syx_transfer_saves_import_confirm
                 : what == SETTINGS ? R.string.syx_transfer_settings_import_confirm
+                : what == MODS ? R.string.syx_transfer_mods_import_confirm
                 : R.string.syx_transfer_controls_import_confirm;
+        String fileName = file;
         new MaterialAlertDialogBuilder(requireContext())
                 .setMessage(getString(message, file))
                 .setPositiveButton(R.string.transfer_import, (d, w) -> {
                     if (what == CONTROLS) importControls(uri, gi);
+                    else if (what == MODS) importMods(uri, gi, fileName);
                     else importData(uri, gi, what == SAVES ? GameDataTransfer.SAVES : GameDataTransfer.CONFIG);
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -204,12 +211,30 @@ public class TransferFragment extends Fragment {
         }, "controls-import").start();
     }
 
+    /** A ZIP of one or several mods into the instance; a mod with the same folder name is replaced. */
+    private void importMods(Uri uri, GameInstance gi, @Nullable String fileName) {
+        final Context app = requireContext().getApplicationContext();
+        String fallback = fileName != null && fileName.toLowerCase(java.util.Locale.ROOT).endsWith(".zip")
+                ? fileName.substring(0, fileName.length() - 4) : fileName;
+        new Thread(() -> {
+            String msg;
+            try {
+                com.udarmolota.syxdroid.game.SyxModImporter.Result r =
+                        com.udarmolota.syxdroid.game.SyxModImporter.install(app, gi, uri, fallback);
+                msg = app.getString(R.string.mods_installed, String.join(", ", r.installed));
+            } catch (Exception e) {
+                msg = app.getString(R.string.mods_install_failed, String.valueOf(e.getMessage()));
+            }
+            toastLater(msg);
+        }, "mods-import").start();
+    }
+
     // ---- export ----
 
     private void startExport(int what) {
         if (gameOrToast() == null) return;
         pending = what;
-        String kind = what == SAVES ? "saves" : what == SETTINGS ? "settings" : "controls";
+        String kind = what == SAVES ? "saves" : what == SETTINGS ? "settings" : what == MODS ? "mods" : "controls";
         String name = "syxdroid_" + kind + "_"
                 + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(new java.util.Date());
         if (what == CONTROLS) exportJson.launch(name + ".json");
@@ -237,6 +262,10 @@ public class TransferFragment extends Fragment {
                     }
                     out.write(json);
                     msg = app.getString(R.string.controls_exported);
+                } else if (what == MODS) {
+                    int count = exportMods(gi, out);
+                    msg = count == 0 ? app.getString(R.string.syx_transfer_mods_none)
+                            : app.getString(R.string.syx_transfer_mods_exported, count);
                 } else {
                     String part = what == SAVES ? GameDataTransfer.SAVES : GameDataTransfer.CONFIG;
                     GameDataTransfer.Result r = GameDataTransfer.export(GameDataTransfer.userDir(gi), out, part);
@@ -249,6 +278,38 @@ public class TransferFragment extends Fragment {
             }
             toastLater(msg);
         }, "transfer-export").start();
+    }
+
+    /** Every mod folder of the instance into one ZIP, each as a top-level folder; returns how many. */
+    private static int exportMods(GameInstance gi, OutputStream out) throws java.io.IOException {
+        File[] mods = com.udarmolota.syxdroid.game.SyxMods.modsDir(gi).listFiles(File::isDirectory);
+        int count = 0;
+        try (java.util.zip.ZipOutputStream zip = new java.util.zip.ZipOutputStream(new java.io.BufferedOutputStream(out, 1 << 16))) {
+            byte[] buf = new byte[1 << 16];
+            if (mods != null) {
+                for (File m : mods) {
+                    addTree(zip, m, m.getName(), buf);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private static void addTree(java.util.zip.ZipOutputStream zip, File f, String path, byte[] buf) throws java.io.IOException {
+        if (f.isDirectory()) {
+            zip.putNextEntry(new java.util.zip.ZipEntry(path + "/"));
+            zip.closeEntry();
+            File[] kids = f.listFiles();
+            if (kids != null) for (File k : kids) addTree(zip, k, path + "/" + k.getName(), buf);
+        } else {
+            zip.putNextEntry(new java.util.zip.ZipEntry(path));
+            try (InputStream in = new java.io.FileInputStream(f)) {
+                int n;
+                while ((n = in.read(buf)) > 0) zip.write(buf, 0, n);
+            }
+            zip.closeEntry();
+        }
     }
 
     // ---- helpers ----

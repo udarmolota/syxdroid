@@ -224,8 +224,10 @@ public class LauncherActivity extends AppCompatActivity {
             // The Report a bug screen: by email or saved to a file
             binding.getRoot().post(() -> navController.navigate(R.id.action_open_bug_report));
         } else if (ACTION_OPEN_TRANSFER.equals(action)) {
-            // Saves, settings and controls import / export
-            binding.getRoot().post(() -> navController.navigate(R.id.action_open_transfer));
+            // Saves, settings, controls and mods import / export. Picked as the bottom bar's tab,
+            // not navigated to over Home: the bar restores each tab's own stack, and a page pushed
+            // over Home came back with it on every tap of Home, so the bar seemed dead.
+            binding.getRoot().post(() -> binding.bottomNav.setSelectedItemId(R.id.transfer_fragment));
         }
     }
 

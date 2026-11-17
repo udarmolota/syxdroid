@@ -32,6 +32,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <!-- The instance's game version: what the mods' V folders are compared with -->
+            <TextView
+                android:id="@+id/tv_mods_game_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:alpha="0.8"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/tv_mods_game_running"
                 android:layout_width="match_parent"

@@ -77,6 +77,54 @@ public final class DownloadsZip {
         return uri;
     }
 
+    /**
+     * Saves a download as it comes (a mod's ZIP) into Download/SyxDroid/name. A name already there
+     * is not overwritten: MediaStore picks "name (1).zip". Marked pending while written, and removed
+     * if the download breaks off.
+     */
+    @NonNull
+    public static Uri save(@NonNull Context context, @NonNull String name, @NonNull java.io.InputStream in,
+                           long total, @NonNull Progress progress) throws IOException {
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, "application/zip");
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/SyxDroid");
+        values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+        Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) throw new IOException("Cannot create " + FOLDER + "/" + name);
+        boolean ok = false;
+        try (OutputStream out = resolver.openOutputStream(uri, "w")) {
+            if (out == null) throw new IOException("Cannot write " + FOLDER + "/" + name);
+            byte[] buf = new byte[64 * 1024];
+            long done = 0;
+            int n;
+            while ((n = in.read(buf)) > 0) {
+                out.write(buf, 0, n);
+                done += n;
+                progress.update(done, total);
+            }
+            ok = true;
+        } finally {
+            if (!ok) {
+                try { resolver.delete(uri, null, null); } catch (Exception ignored) {}
+            }
+        }
+        values.clear();
+        values.put(MediaStore.MediaColumns.IS_PENDING, 0);
+        resolver.update(uri, values, null, null);
+        return uri;
+    }
+
+    /** The file name MediaStore gave a saved download (it may have added " (1)"), or null. */
+    @androidx.annotation.Nullable
+    public static String displayName(@NonNull Context context, @NonNull Uri uri) {
+        try (Cursor c = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+            if (c != null && c.moveToFirst()) return c.getString(0);
+        } catch (Exception ignored) {}
+        return null;
+    }
+
     /** The size of a zip written above, or -1. */
     public static long size(@NonNull Context context, @NonNull Uri uri) {
         try (Cursor c = context.getContentResolver().query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)) {
