@@ -22,8 +22,25 @@ public final class SyxHooks {
             return source;
         }
         if (fixed != source) System.out.println(SyxAgent.TAG + "shader " + fileName + ": sampler2DRect -> sampler2D");
+        if (SyxAgent.pointSize && isParticleVertexShader(fileName)) {
+            String sized = fixed;
+            try {
+                sized = ShaderFix.pointSize(fixed);
+            } catch (RuntimeException e) {
+                System.out.println(SyxAgent.TAG + "point size rewrite failed for " + fileName + ": " + e);
+            }
+            if (sized != fixed) System.out.println(SyxAgent.TAG + "shader " + fileName + ": gl_PointSize from " + ShaderFix.POINT_SIZE_UNIFORM);
+            fixed = sized;
+        }
         dump(fileName, source, fixed);
         return fixed;
+    }
+
+    /** Particle_v.txt, Particle_texture_v.txt, Particle_debug_v.txt: the shaders drawn as GL_POINTS. */
+    static boolean isParticleVertexShader(String fileName) {
+        if (fileName == null) return false;
+        String base = fileName.substring(fileName.lastIndexOf('/') + 1);
+        return base.startsWith("Particle") && base.endsWith("_v.txt");
     }
 
     /** Called instead of starting a child JVM (splash screen, error dialog, launcher relaunch). */

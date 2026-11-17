@@ -33,6 +33,10 @@ import java.lang.instrument.Instrumentation;
  *       {@code snake2d.Sleeper.sync(fps)} waits for the next frame in SyxHooks.sync, which sleeps
  *       the whole wait: the game's version spins in {@code Thread.yield()} for the last part of
  *       every frame, a busy core that only heats the phone.</li>
+ *   <li>{@code -Dsyx.agent.pointSize=false}: leave the particles' point size alone. Otherwise
+ *       the particle vertex shaders write {@code gl_PointSize} from a uniform, and
+ *       {@code snake2d.VboParticles} sets that uniform where it called {@code glPointSize}, which
+ *       GLES does not have (see {@link ShaderFix#pointSize}).</li>
  *   <li>{@code -Dsyx.agent.dumpShaders=<dir>}: write each shader before and after the rewrite
  *       into that folder, for debugging.</li>
  * </ul>
@@ -49,6 +53,7 @@ public final class SyxAgent {
     static boolean noBundledNatives;
     static boolean noProbeWindow;
     static boolean sleep;
+    static boolean pointSize;
     static String dumpShadersDir;
 
     private SyxAgent() {}
@@ -60,10 +65,11 @@ public final class SyxAgent {
         noBundledNatives = flag("syx.agent.noBundledNatives");
         noProbeWindow = flag("syx.agent.noProbeWindow");
         sleep = flag("syx.agent.sleep");
+        pointSize = flag("syx.agent.pointSize");
         dumpShadersDir = System.getProperty("syx.agent.dumpShaders");
         System.out.println(TAG + "loaded: shaders=" + shaders + " rectTextures=" + rectTextures
                 + " noSpawn=" + noSpawn + " noBundledNatives=" + noBundledNatives
-                + " noProbeWindow=" + noProbeWindow + " sleep=" + sleep + (dumpShadersDir != null ? " dumpShaders=" + dumpShadersDir : ""));
+                + " noProbeWindow=" + noProbeWindow + " sleep=" + sleep + " pointSize=" + pointSize + (dumpShadersDir != null ? " dumpShaders=" + dumpShadersDir : ""));
         inst.addTransformer(new SyxTransformer());
     }
 

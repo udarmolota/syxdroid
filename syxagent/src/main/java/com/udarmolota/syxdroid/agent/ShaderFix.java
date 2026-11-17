@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
  * Results are the same for the nearest and linear filtering the game uses, since a texel centre
  * in pixel units ({@code x + 0.5}) maps to the same normalised centre.
  *
+ * <p>{@link #pointSize} is a second, separate fix, for the particle shaders only.
+ *
  * <p>Pure text work with no GL calls, so it is unit-testable on the desktop.
  */
 public final class ShaderFix {
@@ -41,6 +43,53 @@ public final class ShaderFix {
 
         String out = rewriteCalls(src, rectNames);
         return RECT_TYPE.matcher(out).replaceAll("sampler2D");
+    }
+
+    /** The uniform that carries the point size into the particle shaders; set by SyxTransformer's code. */
+    public static final String POINT_SIZE_UNIFORM = "syxPointSize";
+    private static final Pattern MAIN = Pattern.compile("\\bvoid\\s+main\\s*\\(\\s*(?:void)?\\s*\\)\\s*\\{");
+
+    /**
+     * Gives a particle vertex shader its point size. The game draws particles (rain, fire, flowers,
+     * and single pixels into the texture atlas for the minimap) as GL_POINTS and sets their size
+     * with glPointSize, which GLES does not have: there the vertex shader must write gl_PointSize,
+     * or the size is undefined. Adreno happens to draw such points 1 pixel wide; Mali draws them
+     * hundreds of pixels wide (2026-11-17, Mali-G68: coloured squares over the map, and a texture
+     * atlas painted over until the UI fonts were gone).
+     *
+     * <p>The shader gets {@code uniform float syxPointSize;} and, as the last statement of main,
+     * {@code gl_PointSize = max(syxPointSize, 1.0);}. The max keeps points visible should the
+     * uniform never be set. Returns the source itself when it already writes gl_PointSize or has
+     * no main to add it to.
+     */
+    public static String pointSize(String src) {
+        if (src == null || src.contains("gl_PointSize")) return src;
+        Matcher m = MAIN.matcher(src);
+        if (!m.find()) return src;
+        int close = matchingBrace(src, m.end() - 1);
+        if (close < 0) return src;
+        // After the #version line, which must stay first.
+        int declAt = 0;
+        int version = src.indexOf("#version");
+        if (version >= 0) {
+            int eol = src.indexOf('\n', version);
+            if (eol < 0 || eol > m.start()) return src;
+            declAt = eol + 1;
+        }
+        return src.substring(0, declAt) + "uniform float " + POINT_SIZE_UNIFORM + ";\n"
+                + src.substring(declAt, close)
+                + "\tgl_PointSize = max(" + POINT_SIZE_UNIFORM + ", 1.0);\n"
+                + src.substring(close);
+    }
+
+    private static int matchingBrace(String s, int open) {
+        int depth = 0;
+        for (int k = open; k < s.length(); k++) {
+            char c = s.charAt(k);
+            if (c == '{') depth++;
+            else if (c == '}' && --depth == 0) return k;
+        }
+        return -1;
     }
 
     /** Rewrites texture/textureSize/texelFetch calls whose first argument is a rectangle sampler. */

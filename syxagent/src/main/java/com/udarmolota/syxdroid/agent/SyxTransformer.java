@@ -10,7 +10,7 @@ import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 
 /**
- * The bytecode side of {@link SyxAgent}. Touches six classes (five of the game's, one of
+ * The bytecode side of {@link SyxAgent}. Touches seven classes (six of the game's, one of
  * LWJGL's) and nothing else; every other
  * class is returned untouched (null) without being parsed.
  */
@@ -23,6 +23,8 @@ final class SyxTransformer implements ClassFileTransformer {
     private static final String FIND_RESOURCE_DESC = "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;Z)Ljava/net/URL;";
     static final String GPU_PROBE = "snake2d/GraphicsCardGetter";
     static final String SLEEPER = "snake2d/Sleeper";
+    static final String VBO_PARTICLES = "snake2d/VboParticles";
+    static final int GL_CURRENT_PROGRAM = 0x8B8D;
     /** What GraphicsCardGetter.version() reports instead of the probe window's GL strings. */
     static final String PROBE_TEXT = "Android (SyxDroid: GPU probe window skipped, see the GL log above)";
 
@@ -53,6 +55,8 @@ final class SyxTransformer implements ClassFileTransformer {
                     return SyxAgent.noProbeWindow ? skipProbeWindow(classfileBuffer) : null;
                 case SLEEPER:
                     return SyxAgent.sleep ? sleepingSync(classfileBuffer) : null;
+                case VBO_PARTICLES:
+                    return SyxAgent.pointSize ? pointSizeUniform(classfileBuffer) : null;
                 default:
                     return null;
             }
@@ -101,6 +105,52 @@ final class SyxTransformer implements ClassFileTransformer {
             return null;
         }
         System.out.println(SyxAgent.TAG + "hooked " + SHADER + ".getFile");
+        return writer.toByteArray();
+    }
+
+    /**
+     * In snake2d.VboParticles every GL11.glPointSize(size) becomes
+     * "GL20.glUniform1f(GL20.glGetUniformLocation(GL11.glGetInteger(GL_CURRENT_PROGRAM),
+     * "syxPointSize"), size)": GLES has no glPointSize, so the size goes to the uniform
+     * {@link ShaderFix#pointSize} gave the particle shaders. The particle shader is bound at that
+     * point (VboParticles.flush binds it first). A shader without the uniform gives location -1,
+     * which glUniform1f ignores. The GL calls are made by the game's own class, so the agent needs
+     * no LWJGL on its class path.
+     */
+    static byte[] pointSizeUniform(byte[] bytes) {
+        ClassReader reader = new ClassReader(bytes);
+        ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
+        final int[] replaced = {0};
+        reader.accept(new ClassVisitor(Opcodes.ASM9, writer) {
+            @Override
+            public MethodVisitor visitMethod(int access, String name, String desc, String sig, String[] exc) {
+                return new MethodVisitor(Opcodes.ASM9, super.visitMethod(access, name, desc, sig, exc)) {
+                    @Override
+                    public void visitMethodInsn(int opcode, String owner, String mName, String mDesc, boolean itf) {
+                        boolean isPointSize = opcode == Opcodes.INVOKESTATIC && owner.equals("org/lwjgl/opengl/GL11")
+                                && mName.equals("glPointSize") && mDesc.equals("(F)V");
+                        if (!isPointSize) {
+                            super.visitMethodInsn(opcode, owner, mName, mDesc, itf);
+                            return;
+                        }
+                        replaced[0]++;
+                        // stack: size -> size, location -> location, size -> (empty)
+                        super.visitLdcInsn(GL_CURRENT_PROGRAM);
+                        super.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL11", "glGetInteger", "(I)I", false);
+                        super.visitLdcInsn(ShaderFix.POINT_SIZE_UNIFORM);
+                        super.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL20", "glGetUniformLocation",
+                                "(ILjava/lang/CharSequence;)I", false);
+                        super.visitInsn(Opcodes.SWAP);
+                        super.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL20", "glUniform1f", "(IF)V", false);
+                    }
+                };
+            }
+        }, 0);
+        if (replaced[0] == 0) {
+            System.out.println(SyxAgent.TAG + "no glPointSize in " + VBO_PARTICLES + "; left as it is");
+            return null;
+        }
+        System.out.println(SyxAgent.TAG + VBO_PARTICLES + ": " + replaced[0] + " x glPointSize -> uniform " + ShaderFix.POINT_SIZE_UNIFORM);
         return writer.toByteArray();
     }
 
